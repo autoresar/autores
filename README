@@ -6,3 +6,6 @@ Usa también los siguientes archivos:
 
 integrador.py toma el resultado de autores.py en output/resultados.csv y el último dump de la base dbdump.csv 
 y los integra, marcando conflictos y otras observaciones.
+
+El archivo TODO por ahora contiene algunas tareas pendientes. La idea es ir mi-
+grándolo a Issues para una mejor gestión de éstas.
