@@ -16,3 +16,4 @@ HECHO- Tener en cuenta que export de la base usa comillas dobles para delimitar 
 - Ignorar acentos cuando busco en el diccionario de autores, o cambiar un poco el enfoque y buscar autores parecidos (en ese caso, debería avisar con una observación).
 - Las variantes de nombre en el archivo resultados también se tendrían que considerar para buscar en el diccionario de variantes.
 - Capaz podría hacer que las revisiones ocurran e paralelo en vez de en serie.
+- Podría hacer que el mismo script transforme disciplinas.ods en disciplinas.csv sin intervención del usuario (ver http://python-example.blogspot.com.ar/2012/10/how-to-convert-ods-to-csv.html).
