@@ -1,10 +1,41 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+"""autores.py
+
+Extrae la información de autores del "Breve diccionario biográfico de
+autores argentinos: desde 1940" en breve_diccionario.hocr.
+
+Copyright (C) 2016 Proyecto autores.ar
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+
 import re
 import sys
 import pdb
 import difflib
 import csv
 import unicodedata
+
+__author__ = ""
+__copyright__ = "Copyright 2016, Proyecto autores.ar"
+__credits__ = [""]
+__license__ = "GPL"
+__version__ = "3.0"
+__maintainer__ = ""
+__email__ = ""
+__status__ = "Development"
 
 primera_pagina = 17
 discip_predet = 'Escritura'  # establece la disciplina predeterminada de la referencia
