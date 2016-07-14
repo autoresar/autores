@@ -337,7 +337,7 @@ for blocknum, block in enumerate(blocks):
                    bplace, bprovincia, byear, dyear, byear_conf, dyear_conf,
                    oracion, discip, subdiscip))
 
-f = open('resultados.csv', 'w')
+f = open('output/resultados.csv', 'w')
 f.write("'página','nombres','seudonimos','apellidos','genero','name_conf','nick_conf','lastname_conf',"
         "'bplace','lugar_nacimiento','ano_nacimiento','ano_muerte','byear_conf','dyear_conf',"
         "'primera_oración','disciplinas','subdisciplinas',"

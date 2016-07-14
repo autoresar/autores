@@ -138,7 +138,7 @@ def obtenerFinal(campos, nuevo, viejo={}):
 
 
 def escribirResultado(campos, autores):
-    with open('importame.csv', 'w') as csvfile:
+    with open('output/importame.csv', 'w') as csvfile:
         writer = csv.DictWriter(csvfile, campos)
         writer.writeheader()
         for autor in autores:
