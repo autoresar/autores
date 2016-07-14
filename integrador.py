@@ -169,7 +169,7 @@ def compararVariantes(autor, diccionario_variantes):
 def main():
     salida = []
     campos, dump, diccionario_variantes = abrirDump('dbdump.csv')
-    with open('resultados.csv') as csvfile:
+    with open('output/resultados.csv') as csvfile:
         csvreader = csv.DictReader(csvfile, delimiter=',', quotechar="'")
         for linea in csvreader:
             nuevo = linea
