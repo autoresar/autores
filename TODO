@@ -1,0 +1,18 @@
+HECHO- Agregar disciplina por default (Escritura para Breve Diccionario).
+
+- Update or replace existing nodos (using "unique target" mappings)
+HECHO- Hay que cambiar género a "Hombre" o "Mujer"
+- Tengo que revisar la lista de países cargados en el sitio y usarla para la validación:
+Si el autor nació en un país no precargado en la taxonomía correspondiente, no se va a importar esa información y no nos vamos a enterar. Tengo tres opciones, en orden de mi preferencia: 1) activar opción autocrear en el importer (ya que el lugar de nacimiento es sometido a la validación de una lista de países válidos), 2) agregar más países a la taxonomía correspondiente, o 3) incorporar un paso extra de validación en el programa para que marque los países que no fueron precargados en la base.
+
+HECHO- Cambiar separador de disciplinas: "|"
+- Devolver código de subdisciplina (Eve tiene que confirmar si no cambiar nombre de subdisciplinas "otras").
+HECHO- Mapear campo notas.
+HECHO- Permitir múltiples opciones en título de enlace y enlace (ojo que campos asociados).
+HECHO- Tengo que generar otro así accesible sólo para usuarios registrados que devuelva todos los campos (incluyendo campo notas): http://dominiopublico.org.ar/admin/structure/views/view/exportar/edit
+- Export tiene que devolver una forma utilizable de subdisciplina (jerarquía completa o código), o hay que cambiar nombre de las subdisciplinas "otras" en toda la base.
+
+HECHO- Tener en cuenta que export de la base usa comillas dobles para delimitar texto (no parece ser posible elegir).
+- Ignorar acentos cuando busco en el diccionario de autores, o cambiar un poco el enfoque y buscar autores parecidos (en ese caso, debería avisar con una observación).
+- Las variantes de nombre en el archivo resultados también se tendrían que considerar para buscar en el diccionario de variantes.
+- Capaz podría hacer que las revisiones ocurran e paralelo en vez de en serie.
