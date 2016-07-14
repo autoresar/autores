@@ -1,0 +1,8 @@
+autores.py toma breve_diccionario.hocr como entrada y guarda la salida en output/results.csv.
+Usa también los siguientes archivos:
+- nombres.csv: una lista de nombres del Registro Civil de la Ciudad de Buenos Aires, con sus respectivos géneros.
+- disciplinas.csv: creado a partir de disciplinas.ods; indica qué disciplinas y subdisciplinas corresponden a qué rasgos.
+- lugares.csv: una lista de capitales, provincias y países usada para validación.
+
+integrador.py toma el resultado de autores.py en output/resultados.csv y el último dump de la base dbdump.csv 
+y los integra, marcando conflictos y otras observaciones.
