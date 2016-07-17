@@ -114,8 +114,11 @@ def abrirDump(filename):
 
 def verConflictos(nuevo, viejo, ignorar_conflictos):
     conflictos = []
-    foco = ['genero', 'lugar_nacimiento', 'fecha_nacimiento', 'fecha_muerte',
-            'ano_muerte']
+    # incluye apellidos y nombres en la detección de conflictos porque podría
+    # haber diferencias en el uso de las mayúsculas (que son ignoradas en la
+    # identifiación de duplicados)
+    foco = ['apellidos', 'nombres', 'genero', 'lugar_nacimiento',
+            'fecha_nacimiento', 'fecha_muerte', 'ano_muerte']
     for campo in foco:
         if campo in nuevo:
             campo_nuevo = nuevo[campo]
@@ -197,22 +200,22 @@ def main():
             final = None
             # si el nombre de campo no existe, crea uno vacío
             for campo in campos:
-                if not campo in linea:
-                    linea[campo] = ''
+                if not campo in nuevo:
+                    nuevo[campo] = ''
             # para construir el diccionario de nombres, se pasan a minúsculas
             # para evitar que no coincidan por simple diferencia de mayúsculas/
             # minúsculas:
-            apellido = linea['apellidos'].lower()
-            nombre = linea['nombres'].lower()
+            apellido = nuevo['apellidos'].lower()
+            nombre = nuevo['nombres'].lower()
             nombre_completo = '%s %s' % (nombre, apellido)
-            ano_nacimiento = linea['ano_nacimiento']
-            if nombre_completo in dump and not linea['forzar_nuevo']:
+            ano_nacimiento = nuevo['ano_nacimiento']
+            if nombre_completo in dump and not nuevo['forzar_nuevo']:
                 if ano_nacimiento in dump[nombre_completo]:
                     autores_viejos = dump[nombre_completo][ano_nacimiento]
                     if len(autores_viejos) < 2:
                         viejo = autores_viejos[0]
                         conflictos, viejo = (verConflictos(nuevo, viejo,
-                                             linea['ignorar_conflictos']))
+                                             nuevo['ignorar_conflictos']))
                         if conflictos == 'sin conflictos':
                             final = obtenerFinal(campos, nuevo, viejo)
                         else:
@@ -231,7 +234,7 @@ def main():
             else:
                 final = obtenerFinal(campos, nuevo)
                 variantes = compararVariantes(nuevo, diccionario_variantes)
-                if variantes != 'sin variantes' and not linea['forzar_nuevo']:
+                if variantes != 'sin variantes' and not nuevo['forzar_nuevo']:
                     final['obs_tipo'] = 'VARIANTES'
                     final['obs_descripcion'] = variantes
                 else:
