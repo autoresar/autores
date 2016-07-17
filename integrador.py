@@ -82,7 +82,10 @@ def abrirDump(filename):
             # si años de nacimiento o de muerte no están disponibles, intenta
             # obtenerlos de las fechas de nacimiento o de muerte:
             if not linea['ano_nacimiento']:
-                linea['ano_nacimiento'] = linea['fecha_nacimiento'][-4:]
+                if linea['fecha_nacimiento']:
+                    linea['ano_nacimiento'] = linea['fecha_nacimiento'][-4:]
+                else:
+                    linea['ano_nacimiento'] = 'sin año de nacimiento'
             if not linea['ano_muerte']:
                 linea['ano_muerte'] = linea['ano_muerte'][-4:]
 
