@@ -1,0 +1,9 @@
+Instrucciones de integración:
+
+La planilla "importame.csv" contiene una línea por cada autor en el archivo "resultados.csv".
+Si nombres, apellidos y año de nacimiento del autor coinciden con los de alguno en el volcado de la base de datos "dbdump.csv", y no se han detectado conflictos, se asigna el número de identificación "nid" del autor precargado, se combina la información y se indican las adiciones realizadas.
+Si se detectan conflictos en alguno de los campos, la información no se combina y éstos son descriptos al final de la línea.
+En los campos en conflicto:
+ - Si se desea que la información precargada permanezca en la base de datos, ésta se debe copiar al archivo "resultados.csv".
+ - Si se desea que la nueva información sobreescriba a la precargada en la base de datos, se debe indicar la opción "ignorar_conflictos" al final de la línea en "resultados.csv".
+La información en conflicto, sea nueva o precargada, que no se desee perder, puede copiarse al campo "notas" en "resultados.csv".
