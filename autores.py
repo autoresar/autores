@@ -90,7 +90,7 @@ def obtenerDisciplinas(lista_rasgos, disciplina_predeterminada):
     for elemento in mi_lista:
         mis_disciplinas.add(elemento.split(': ')[0])
         if elemento.split(': ')[1]:
-            mis_subdiscip.add(elemento)
+            mis_subdiscip.add(elemento.split(': ')[1])
     if not mi_lista:
         empty = 1
     mis_disciplinas.add(disciplina_predeterminada)
