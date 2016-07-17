@@ -39,6 +39,8 @@ __status__ = "Development"
 
 primera_pagina = 17
 discip_predet = 'Escritura'  # establece la disciplina predeterminada de la referencia
+# establece el nombre de la fuente procesada:
+fuente = 'Breve diccionario biográfico de autores argentinos desde 1940. 1999'
 
 f = open('breve_diccionario.hocr', 'rU')
 hocr = f.read()
@@ -372,9 +374,10 @@ f = open('output/resultados.csv', 'w')
 f.write("'página','nombres','seudonimos','apellidos','genero','name_conf','nick_conf','lastname_conf',"
         "'bplace','lugar_nacimiento','ano_nacimiento','ano_muerte','byear_conf','dyear_conf',"
         "'primera_oración','disciplinas','subdisciplinas',"
-        "'notas','ignorar_conflictos','forzar_nuevo'\n")
+        "'fuentes','notas','ignorar_conflictos','forzar_nuevo'\n")
 for author in result:
-    line = "'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',,," % author
+    line = "'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s'," % author
+    line += "'%s',,," % fuente
     f.write(line+'\n')
 f.close()
 
