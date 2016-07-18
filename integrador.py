@@ -222,6 +222,20 @@ def compararVariantes(autor, diccionario_variantes):
     return posibles_autores
 
 
+def buscarSimilar(nombre, diccionario, corte, maxdif):
+    nombre_similar = ''
+    similar = difflib.get_close_matches(nombre, diccionario.keys(), n=1,
+                                        cutoff=corte)
+    if similar:
+        mayor_long = max(len(nombre), len(similar[0]))
+        cociente = difflib.SequenceMatcher(None, nombre, similar[0]).ratio()
+        coinciden = cociente * len(nombre + similar[0]) / 2
+        dif = mayor_long - coinciden
+        if dif <= maxdif:
+            nombre_similar = similar[0].title()
+    return nombre_similar
+
+
 def main():
     salida = []
     campos, dump, diccionario_variantes = abrirDump(volcado)
@@ -269,11 +283,10 @@ def main():
                     final['obs_tipo'] = 'OTROS NACIMIENTOS'
                     final['obs_descripcion'] = otros_anos
             else:  # si no se encuentra autor con mismo nombre
-                nombre_similar = (difflib.get_close_matches(nombre_completo,
-                                  dump.keys(), n=1, cutoff=.8))
+                nombre_similar = buscarSimilar(nombre_completo, dump, .8, 2)
                 if nombre_similar:
                     final['obs_tipo'] = 'SIMILAR'
-                    final['obs_descripcion'] = nombre_similar[0].title()
+                    final['obs_descripcion'] = nombre_similar
                 else:  # si no se encuentra un nombre similar
                     variantes = compararVariantes(nuevo, diccionario_variantes)
                     if variantes != 'sin variantes':

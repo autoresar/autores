@@ -19,3 +19,8 @@ HECHO- Ignorar acentos cuando busco en el diccionario de autores, o cambiar un p
  - Podría hacer que el mismo script transforme disciplinas.ods en disciplinas.csv sin intervención del usuario (ver http://python-example.blogspot.com.ar/2012/10/how-to-convert-ods-to-csv.html).
  - También para búsqueda de variantes ignorar mayúsuclas, acentos, y flexibilizar.
 HECHO- En autores.py, agregar nombre de la fuente.
+
+HECHO- Permitir al usuario especificar como argumento de autores.py el nombre del archivo de entrada y el de salida. Idem integrador.py.
+ - Advertir al usuario si el programa sobreescribirá un archivo.
+ - Manejar que el autor precargado tenga un enlace a Wikipedia (mismo enlace_titulo), pero diferente URL (distinto enlace_url, ejemplo con y sin https).
+ - Ajustar la búsqueda flexible de autores.
