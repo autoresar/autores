@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import csv
 import pdb
 import re
+import unicodedata
 
 
 class AutoVivification(dict):
@@ -33,6 +34,13 @@ class AutoVivification(dict):
         except KeyError:
             value = self[item] = type(self)()
             return value
+
+
+def simplificar(texto):
+    """Convierte mayúsculas en minúsculas y simplifica caracteres especiales"""
+    texto = texto.lower()
+    texto = (unicodedata.normalize('NFD', texto).encode('ascii', 'ignore'))
+    return texto
 
 
 def obtenerVariantes(nombre, apellido, genero):
@@ -94,11 +102,14 @@ def abrirDump(filename):
             # los nombres completos se obtienen como "nombre apellido" porque
             # así es como están cargadas las variantes de nombre.
             nombre_completo = '%s %s' % (nombre, apellido)
+            # se simplifican mayúsculas y caracteres especiales del nombre
+            # completo para garantizar la identifiación de autores duplicados:
+            nombre_completo = simplificar(nombre_completo)
             ano_nacimiento = linea['ano_nacimiento']
-            if ano_nacimiento in arbol[nombre_completo.lower()]:
-                arbol[nombre_completo.lower()][ano_nacimiento].append(linea)
+            if ano_nacimiento in arbol[nombre_completo]:
+                arbol[nombre_completo][ano_nacimiento].append(linea)
             else:
-                arbol[nombre_completo.lower()][ano_nacimiento] = [linea]
+                arbol[nombre_completo][ano_nacimiento] = [linea]
             # obtiene variantes del nombre y agrega info del autor al
             # diccionario de variantes:
             genero = linea['genero']
@@ -106,7 +117,8 @@ def abrirDump(filename):
             variantes |= set(obtenerVariantes(nombre, apellido, genero))
             for variante in variantes:
                 variante = variante.lower()
-                info_autor = {'nid': linea['nid'], 'nombre': nombre_completo,
+                info_autor = {'nid': linea['nid'],
+                              'nombre': '%s %s' % (nombre, apellido),
                               'ano': ano_nacimiento}
                 if variante in diccionario_variantes:
                     diccionario_variantes[variante].append(info_autor)
@@ -208,9 +220,12 @@ def main():
             # para construir el diccionario de nombres, se pasan a minúsculas
             # para evitar que no coincidan por simple diferencia de mayúsculas/
             # minúsculas:
-            apellido = nuevo['apellidos'].lower()
-            nombre = nuevo['nombres'].lower()
+            apellido = nuevo['apellidos']
+            nombre = nuevo['nombres']
             nombre_completo = '%s %s' % (nombre, apellido)
+            # simplifica mayúsculas y caracteres especiales del nombre completo
+            # con el que se buscará en el diccionario de autores precargados:
+            nombre_completo = simplificar(nombre_completo)
             ano_nacimiento = nuevo['ano_nacimiento']
             if nombre_completo in dump and not nuevo['forzar_nuevo']:
                 if ano_nacimiento in dump[nombre_completo]:
