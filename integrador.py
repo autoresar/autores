@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-"""integrador.py
-Integra la información devuelta por autores.py con el último volcado
-de la base en dbdumb.csv.
+"""integrador.py resultados volcado salida
+Integra el resultado devuelto por autores.py con el último volcado
+de la base.
 
 Copyright (C) 2016 Proyecto autores.ar
 
@@ -24,7 +24,17 @@ import pdb
 import re
 import unicodedata
 import difflib
+import sys
 
+resultados = 'output/resultados.csv'
+volcado = 'output/dbdump.csv'
+importable = 'output/importame.csv'
+if sys.argv[1]:
+    resultados = sys.argv[1]
+if sys.argv[2]:
+    volcado = sys.argv[2]
+if sys.argv[3]:
+    importable = sys.argv[3]
 
 class AutoVivification(dict):
     """Implementation of perl's autovivification feature.
@@ -182,7 +192,7 @@ def combinar(campos, nuevo, viejo):
 
 
 def escribirResultado(campos, autores):
-    with open('output/importame.csv', 'w') as csvfile:
+    with open(importable, 'w') as csvfile:
         writer = csv.DictWriter(csvfile, campos)
         writer.writeheader()
         for autor in autores:
@@ -214,8 +224,8 @@ def compararVariantes(autor, diccionario_variantes):
 
 def main():
     salida = []
-    campos, dump, diccionario_variantes = abrirDump('output/dbdump.csv')
-    with open('output/resultados.csv') as csvfile:
+    campos, dump, diccionario_variantes = abrirDump(volcado)
+    with open(resultados) as csvfile:
         csvreader = csv.DictReader(csvfile, delimiter=',', quotechar="'")
         for linea in csvreader:
             nuevo = linea

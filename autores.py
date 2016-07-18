@@ -28,21 +28,19 @@ import difflib
 import csv
 import unicodedata
 
-__author__ = ""
-__copyright__ = "Copyright 2016, Proyecto autores.ar"
-__credits__ = [""]
-__license__ = "GPL"
-__version__ = "3.0"
-__maintainer__ = ""
-__email__ = ""
-__status__ = "Development"
+ocr = 'breve_diccionario.hocr'
+resultados = 'output/resultados.csv'
+if sys.argv[1]:
+    ocr = sys.argv[1]
+if sys.argv[2]:
+    resultados = sys.argv[2]
 
 primera_pagina = 17
 discip_predet = 'Escritura'  # establece la disciplina predeterminada de la referencia
 # establece el nombre de la fuente procesada:
 fuente = 'Breve diccionario biográfico de autores argentinos desde 1940. 1999'
 
-f = open('breve_diccionario.hocr', 'rU')
+f = open(ocr, 'rU')
 hocr = f.read()
 f.close()
 
@@ -370,7 +368,7 @@ for blocknum, block in enumerate(blocks):
                    bplace, bprovincia, byear, dyear, byear_conf, dyear_conf,
                    oracion, discip, subdiscip))
 
-f = open('output/resultados.csv', 'w')
+f = open(resultados, 'w')
 f.write("'página','nombres','seudonimos','apellidos','genero','name_conf','nick_conf','lastname_conf',"
         "'bplace','lugar_nacimiento','ano_nacimiento','ano_muerte','byear_conf','dyear_conf',"
         "'primera_oración','disciplinas','subdisciplinas',"
