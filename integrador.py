@@ -23,6 +23,7 @@ import csv
 import pdb
 import re
 import unicodedata
+import difflib
 
 
 class AutoVivification(dict):
@@ -39,7 +40,8 @@ class AutoVivification(dict):
 def simplificar(texto):
     """Convierte mayúsculas en minúsculas y simplifica caracteres especiales"""
     texto = texto.lower()
-    texto = (unicodedata.normalize('NFD', texto).encode('ascii', 'ignore'))
+    texto = (unicodedata.normalize('NFD', texto).encode('ascii', 'ignore')
+             .decode())
     return texto
 
 
@@ -128,6 +130,12 @@ def abrirDump(filename):
 
 
 def verConflictos(nuevo, viejo, ignorar_conflictos):
+    """Busca conflictos entre 'nuevo' y 'viejo' en los campos ennumerados en la
+    variable 'foco' definida en esta función, y devuelve una lista de los
+    conflictos identificados. Si la opción ignorar_conflictos está configurada,
+    devuelve una versión de 'viejo' con los campos en conflicto sobreescritos.
+    Si esta opción no está configurada, devuelve la versión de 'viejo' sin
+    modificar."""
     conflictos = []
     # incluye apellidos y nombres en la detección de conflictos porque podría
     # haber diferencias en el uso de las mayúsculas (que son ignoradas en la
@@ -151,9 +159,9 @@ def verConflictos(nuevo, viejo, ignorar_conflictos):
     return ', '.join(conflictos), viejo
 
 
-def obtenerFinal(campos, nuevo, viejo={}):
-    if not viejo:
-        viejo = nuevo
+def combinar(campos, nuevo, viejo):
+    """Devuelve la combinación de nuevo y viejo en los campos indicados, y una
+    lista de las adiciones realizadas."""
     final = {}
     adiciones = []
     for campo in campos:
@@ -170,9 +178,7 @@ def obtenerFinal(campos, nuevo, viejo={}):
     if not adiciones:
         adiciones = ['sin adiciones']
     adiciones = ', '.join(adiciones)
-    final['obs_tipo'] = 'ADICIONES'
-    final['obs_descripcion'] = adiciones
-    return final
+    return final, adiciones
 
 
 def escribirResultado(campos, autores):
@@ -184,6 +190,8 @@ def escribirResultado(campos, autores):
 
 
 def compararVariantes(autor, diccionario_variantes):
+    """Devuelve un set de posibles duplicados precargados a partir de las
+    variantes de nombre"""
     variantes = []
     if autor['variantes']:
         variantes += autor['variantes']
@@ -211,8 +219,6 @@ def main():
         csvreader = csv.DictReader(csvfile, delimiter=',', quotechar="'")
         for linea in csvreader:
             nuevo = linea
-            viejo = None
-            final = None
             # si el nombre de campo no existe, crea uno vacío
             for campo in campos:
                 if not campo in nuevo:
@@ -227,7 +233,11 @@ def main():
             # con el que se buscará en el diccionario de autores precargados:
             nombre_completo = simplificar(nombre_completo)
             ano_nacimiento = nuevo['ano_nacimiento']
-            if nombre_completo in dump and not nuevo['forzar_nuevo']:
+            final, _ = combinar(campos, nuevo, nuevo)
+            if nuevo['forzar_nuevo']:
+                final['obs_tipo'] = 'NUEVO'
+                final['obs_descripcion'] = 'forzado'
+            elif nombre_completo in dump:
                 if ano_nacimiento in dump[nombre_completo]:
                     autores_viejos = dump[nombre_completo][ano_nacimiento]
                     if len(autores_viejos) < 2:
@@ -235,29 +245,33 @@ def main():
                         conflictos, viejo = (verConflictos(nuevo, viejo,
                                              nuevo['ignorar_conflictos']))
                         if conflictos == 'sin conflictos':
-                            final = obtenerFinal(campos, nuevo, viejo)
-                        else:
-                            final = obtenerFinal(campos, nuevo)
+                            final, adiciones = combinar(campos, nuevo, viejo)
+                            final['obs_tipo'] = 'ADICIONES'
+                            final['obs_descripcion'] = adiciones
+                        else:  # si hay conflictos
                             final['obs_tipo'] = 'CONFLICTOS'
                             final['obs_descripcion'] = conflictos
-                    else:
-                        final = obtenerFinal(campos, nuevo)
+                    else:  # si más de un autor con mismo nombre y nacimiento
                         final['obs_tipo'] = '>1 AUTOR MISMO NACIMIENTO'
                         final['obs_descripcion'] = ''
-                else:
+                else:  # si más de un autor con mismo nombre completo
                     otros_anos = ' / '.join(dump[nombre_completo].keys())
-                    final = obtenerFinal(campos, nuevo)
                     final['obs_tipo'] = 'OTROS NACIMIENTOS'
                     final['obs_descripcion'] = otros_anos
-            else:
-                final = obtenerFinal(campos, nuevo)
-                variantes = compararVariantes(nuevo, diccionario_variantes)
-                if variantes != 'sin variantes' and not nuevo['forzar_nuevo']:
-                    final['obs_tipo'] = 'VARIANTES'
-                    final['obs_descripcion'] = variantes
-                else:
-                    final['obs_tipo'] = 'NUEVO'
-                    final['obs_descripcion'] = 'sin observaciones'
+            else:  # si no se encuentra autor con mismo nombre
+                nombre_similar = (difflib.get_close_matches(nombre_completo,
+                                  dump.keys(), n=1, cutoff=.8))
+                if nombre_similar:
+                    final['obs_tipo'] = 'SIMILAR'
+                    final['obs_descripcion'] = nombre_similar[0].title()
+                else:  # si no se encuentra un nombre similar
+                    variantes = compararVariantes(nuevo, diccionario_variantes)
+                    if variantes != 'sin variantes':
+                        final['obs_tipo'] = 'VARIANTES'
+                        final['obs_descripcion'] = variantes
+                    else:  # si no se encuentra nombre similar ni variante
+                        final['obs_tipo'] = 'NUEVO'
+                        final['obs_descripcion'] = 'sin observaciones'
             salida.append(final)
     campos += ['obs_tipo', 'obs_descripcion']
     escribirResultado(campos, salida)
