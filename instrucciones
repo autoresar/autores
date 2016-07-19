@@ -1,9 +1,13 @@
 Instrucciones de integración:
 
 La planilla "importame.csv" contiene una línea por cada autor en el archivo "resultados.csv".
-Si nombres completo (nombres seguido de apellidos) año de nacimiento del autor coinciden con los de alguno en el volcado de la base de datos "dbdump.csv", y no se han detectado conflictos, se asigna el número de identificación "nid" del autor precargado, se combina la información y se indican las adiciones realizadas.
+Si nombre completo (nombres seguido de apellidos) y año de nacimiento del autor coinciden con los de alguno en el volcado de la base de datos "dbdump.csv" (ignorando mayúsculas y caracteres especiales), y no se han detectado conflictos, se asigna el número de identificación "nid" del autor precargado, se combina la información y se indican las adiciones realizadas.
 Si se detectan conflictos en alguno de los campos, la información no se combina y éstos son descriptos al final de la línea en la columna "obs_descripcion" (con el formato: "nueva información / información precargada").
 En los campos en conflicto:
  - Si se desea que la información precargada permanezca en la base de datos, ésta se debe copiar al archivo "resultados.csv".
  - Si se desea que la nueva información sobreescriba a la precargada en la base de datos, se debe indicar la opción "ignorar_conflictos" al final de la línea en "resultados.csv".
 La información en conflicto, sea nueva o precargada, que no se desee perder, puede copiarse al campo "notas" en "resultados.csv".
+
+Si nombre completo no coincide con ninguno de los autores cargados previamente, primero busca si hay nombres similares (es decir, separados por una distancia de Levenschtein no mayor que 2). Si encuentra nombres similares, los indica para revisión manual:
+- Si alguno de los nombres similares identificados corresponde efectivamente al autor, actualizar su información en la planilla resultados para que sea identificado correctamente en la próxima integración.
+- Si, por el contrario, no corresponden al autor, configurar la opción "ignorar_similares" en la planilla resultados antes de la próxima iteración.
