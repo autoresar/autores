@@ -23,7 +23,7 @@ import csv
 import pdb
 import re
 import unicodedata
-import difflib
+import Levenshtein
 import sys
 
 resultados = 'output/resultados.csv'
@@ -222,18 +222,18 @@ def compararVariantes(autor, diccionario_variantes):
     return posibles_autores
 
 
-def buscarSimilar(nombre, diccionario, corte, maxdif):
-    nombre_similar = ''
-    similar = difflib.get_close_matches(nombre, diccionario.keys(), n=1,
-                                        cutoff=corte)
-    if similar:
-        mayor_long = max(len(nombre), len(similar[0]))
-        cociente = difflib.SequenceMatcher(None, nombre, similar[0]).ratio()
-        coinciden = cociente * len(nombre + similar[0]) / 2
-        dif = mayor_long - coinciden
-        if dif <= maxdif:
-            nombre_similar = similar[0].title()
-    return nombre_similar
+def buscarSimilares(cadena, diccionario, maxdist):
+    similares = []
+    nombres = diccionario.keys()
+    mindist = maxdist
+    for nombre in nombres:
+        distancia = Levenshtein.distance(cadena, nombre)
+        if distancia == mindist:
+            similares.append(nombre.title())
+        elif distancia < mindist:
+            similares = [nombre.title()]
+    similares = ', '.join(similares)
+    return similares
 
 
 def main():
@@ -283,10 +283,10 @@ def main():
                     final['obs_tipo'] = 'OTROS NACIMIENTOS'
                     final['obs_descripcion'] = otros_anos
             else:  # si no se encuentra autor con mismo nombre
-                nombre_similar = buscarSimilar(nombre_completo, dump, .8, 2)
-                if nombre_similar:
-                    final['obs_tipo'] = 'SIMILAR'
-                    final['obs_descripcion'] = nombre_similar
+                nombres_similares = buscarSimilares(nombre_completo, dump, 2)
+                if nombres_similares:
+                    final['obs_tipo'] = 'SIMILARES'
+                    final['obs_descripcion'] = nombres_similares
                 else:  # si no se encuentra un nombre similar
                     variantes = compararVariantes(nuevo, diccionario_variantes)
                     if variantes != 'sin variantes':
