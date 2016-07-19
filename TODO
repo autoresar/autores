@@ -24,3 +24,5 @@ HECHO- En autores.py, agregar nombre de la fuente.
  - Advertir al usuario si el programa sobreescribirá un archivo.
 HECHO- Manejar que el autor precargado tenga un enlace a Wikipedia (mismo enlace_titulo), pero diferente URL (distinto enlace_url, ejemplo con y sin https).
 HECHO- Ajustar la búsqueda flexible de autores.
+
+ - En autores.py, agregar un identificador de errores cuando los autores no están ordenados alfabéticamente.
