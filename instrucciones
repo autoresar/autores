@@ -11,3 +11,5 @@ La información en conflicto, sea nueva o precargada, que no se desee perder, pu
 Si nombre completo no coincide con ninguno de los autores cargados previamente, primero busca si hay nombres similares (es decir, separados por una distancia de Levenschtein no mayor que 2). Si encuentra nombres similares, los indica para revisión manual:
 - Si alguno de los nombres similares identificados corresponde efectivamente al autor, actualizar su información en la planilla resultados para que sea identificado correctamente en la próxima integración.
 - Si, por el contrario, no corresponden al autor, configurar la opción "ignorar_similares" en la planilla resultados antes de la próxima iteración.
+
+Autores en la fuente original que hayan sido omitidos por el script de extracción (y que, por lo tanto, no figuren en la planilla de resultados) serán cargados en http://bit.ly/autoresomitidos para optimizar el script de extracción.

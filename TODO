@@ -26,3 +26,7 @@ HECHO- Manejar que el autor precargado tenga un enlace a Wikipedia (mismo enlace
 HECHO- Ajustar la búsqueda flexible de autores.
 
  - En autores.py, agregar un identificador de errores cuando los autores no están ordenados alfabéticamente.
+ - En integrador agregar una serie de comprobaciones inciales: verificar el orden alfabético de los autores (señalar aquellos fuera del orden alfabético como posibles errores); tiene sentido hacerlo acá además de en el extractor porque en el futuro podrían usarse planillas cargadas manualmente.
+ - Otra comprobación inicial en el integrador: señalar las líneas que tengan observaciones sin remover señaladas por el extractor.
+ - Modificar el extractor para que devuelva una planilla de resultados en la que cada fila esté identificada con un número de orden. Así, será más fácil saber qué filas fueron removidas y modificadas más adelante.
+HECHO- Indicar en las instrucciones de uso que los autores ausentes (es decir, en la fuente pero no en la planilla de resultados) deben volcarse a una planilla central.
