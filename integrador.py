@@ -173,7 +173,8 @@ def fusionarEnlaces(autor):
     fusion = []
     for i, titulo in enumerate(autor['enlaces_titulo'].split('|')):
         url = autor['enlaces_url'].split('|')[i]
-        fusion.append(titulo + '>>' + url)
+        if titulo:
+            fusion.append(titulo + '>>' + url)
     fusion = '|'.join(fusion)
     return fusion
 
@@ -183,7 +184,8 @@ def separarEnlaces(autor):
     urls = []
     for enlace in autor['enlaces'].split('|'):
         titulos.append(enlace.split('>>')[0])
-        urls.append(enlace.split('>>')[1])
+        if enlace:
+            urls.append(enlace.split('>>')[1])
     titulos = '|'.join(titulos)
     urls = '|'.join(urls)
     del autor['enlaces']
