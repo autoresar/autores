@@ -1,4 +1,4 @@
-sHECHO- Agregar disciplina por default (Escritura para Breve Diccionario).
+HECHO- Agregar disciplina por default (Escritura para Breve Diccionario).
 
 - Update or replace existing nodos (using "unique target" mappings)
 HECHO- Hay que cambiar género a "Hombre" o "Mujer"
@@ -20,7 +20,7 @@ HECHO- Ignorar acentos cuando busco en el diccionario de autores, o cambiar un p
  - También para búsqueda de variantes ignorar mayúsuclas, acentos, y flexibilizar.
 HECHO- En autores.py, agregar nombre de la fuente.
 
-HECHO- Permitir al usuario especificar como argumento de autores.py el nombre del archivo de entrada y el de salida. Idem integrador.py.
+ - Corregir: Permitir al usuario especificar como argumento de autores.py el nombre del archivo de entrada y el de salida. Idem integrador.py.
  - Advertir al usuario si el programa sobreescribirá un archivo.
- - Manejar que el autor precargado tenga un enlace a Wikipedia (mismo enlace_titulo), pero diferente URL (distinto enlace_url, ejemplo con y sin https).
- - Ajustar la búsqueda flexible de autores.
+HECHO- Manejar que el autor precargado tenga un enlace a Wikipedia (mismo enlace_titulo), pero diferente URL (distinto enlace_url, ejemplo con y sin https).
+HECHO- Ajustar la búsqueda flexible de autores.

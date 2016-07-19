@@ -169,12 +169,40 @@ def verConflictos(nuevo, viejo, ignorar_conflictos):
     return ', '.join(conflictos), viejo
 
 
+def fusionarEnlaces(autor):
+    fusion = []
+    for i, titulo in enumerate(autor['enlaces_titulo'].split('|')):
+        url = autor['enlaces_url'].split('|')[i]
+        fusion.append(titulo + '>>' + url)
+    fusion = '|'.join(fusion)
+    return fusion
+
+
+def separarEnlaces(autor):
+    titulos = []
+    urls = []
+    for enlace in autor['enlaces'].split('|'):
+        titulos.append(enlace.split('>>')[0])
+        urls.append(enlace.split('>>')[1])
+    titulos = '|'.join(titulos)
+    urls = '|'.join(urls)
+    del autor['enlaces']
+    return titulos, urls
+
+
 def combinar(campos, nuevo, viejo):
     """Devuelve la combinación de nuevo y viejo en los campos indicados, y una
     lista de las adiciones realizadas."""
     final = {}
     adiciones = []
-    for campo in campos:
+    lista_campos = campos[:]
+    # fusiona los campos enlaces antes de combinar:
+    lista_campos.remove('enlaces_titulo')
+    lista_campos.remove('enlaces_url')
+    lista_campos.append('enlaces')
+    nuevo['enlaces'] = fusionarEnlaces(nuevo)
+    viejo['enlaces'] = fusionarEnlaces(viejo)
+    for campo in lista_campos:
         campo_nuevo = set()
         campo_viejo = set()
         if nuevo[campo]:
@@ -188,6 +216,8 @@ def combinar(campos, nuevo, viejo):
     if not adiciones:
         adiciones = ['sin adiciones']
     adiciones = ', '.join(adiciones)
+    # separa el campo enlaces antes de devolver resultado final:
+    final['enlaces_titulo'], final['enlaces_url'] = separarEnlaces(final)
     return final, adiciones
 
 
