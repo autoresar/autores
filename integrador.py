@@ -140,7 +140,7 @@ def abrirDump(filename):
 
 
 def verConflictos(nuevo, viejo, ignorar_conflictos):
-    """Busca conflictos entre 'nuevo' y 'viejo' en los campos ennumerados en la
+    """Busca conflictos entre 'nuevo' y 'viejo' en los campos enumerados en la
     variable 'foco' definida en esta función, y devuelve una lista de los
     conflictos identificados. Si la opción ignorar_conflictos está configurada,
     devuelve una versión de 'viejo' con los campos en conflicto sobreescritos.
@@ -222,18 +222,33 @@ def compararVariantes(autor, diccionario_variantes):
     return posibles_autores
 
 
-def buscarSimilares(cadena, diccionario, maxdist):
+def buscarSimilares(cadena, diccionario, maxdist, ignorar_similares):
+    """Buscar cadenas similares a la cadena entre las claves del diccionario,
+    con distancias de edición de Levinshtein menor o iguales a maxdist"""
     similares = []
-    nombres = diccionario.keys()
-    mindist = maxdist
-    for nombre in nombres:
-        distancia = Levenshtein.distance(cadena, nombre)
-        if distancia == mindist:
-            similares.append(nombre.title())
-        elif distancia < mindist:
-            similares = [nombre.title()]
+    if not ignorar_similares:
+        nombres = diccionario.keys()
+        mindist = maxdist
+        for nombre in nombres:
+            distancia = Levenshtein.distance(cadena, nombre)
+            if distancia == mindist:
+                similares.append(nombre.title())
+            elif distancia < mindist:
+                similares = [nombre.title()]
     similares = ', '.join(similares)
     return similares
+
+
+def obtenerOpciones(autor, lista_opciones):
+    """Devuelve un tuple de unos y ceros para las opciones enumeradas en la
+    lista, según cómo hayan sido configuradas para el autor."""
+    valor_opciones = []
+    for opcion in lista_opciones:
+        if opcion in autor['opciones']:
+            valor_opciones.append(1)
+        else:
+            valor_opciones.append(0)
+    return tuple(valor_opciones)
 
 
 def main():
@@ -243,6 +258,12 @@ def main():
         csvreader = csv.DictReader(csvfile, delimiter=',', quotechar="'")
         for linea in csvreader:
             nuevo = linea
+            # obtiene la configuración de las opciones:
+            (forzar_nuevo,
+             ignorar_conflictos,
+             ignorar_similares) = obtenerOpciones(nuevo, ['forzar_nuevo',
+                                                  'ignorar_conflictos',
+                                                  'ignorar_similares'])
             # si el nombre de campo no existe, crea uno vacío
             for campo in campos:
                 if not campo in nuevo:
@@ -258,7 +279,7 @@ def main():
             nombre_completo = simplificar(nombre_completo)
             ano_nacimiento = nuevo['ano_nacimiento']
             final, _ = combinar(campos, nuevo, nuevo)
-            if nuevo['forzar_nuevo']:
+            if forzar_nuevo:
                 final['obs_tipo'] = 'NUEVO'
                 final['obs_descripcion'] = 'forzado'
             elif nombre_completo in dump:
@@ -266,8 +287,8 @@ def main():
                     autores_viejos = dump[nombre_completo][ano_nacimiento]
                     if len(autores_viejos) < 2:
                         viejo = autores_viejos[0]
-                        conflictos, viejo = (verConflictos(nuevo, viejo,
-                                             nuevo['ignorar_conflictos']))
+                        conflictos, viejo = verConflictos(nuevo, viejo,
+                                                          ignorar_conflictos)
                         if conflictos == 'sin conflictos':
                             final, adiciones = combinar(campos, nuevo, viejo)
                             final['obs_tipo'] = 'ADICIONES'
@@ -283,7 +304,8 @@ def main():
                     final['obs_tipo'] = 'OTROS NACIMIENTOS'
                     final['obs_descripcion'] = otros_anos
             else:  # si no se encuentra autor con mismo nombre
-                nombres_similares = buscarSimilares(nombre_completo, dump, 2)
+                nombres_similares = buscarSimilares(nombre_completo, dump, 2,
+                                                    ignorar_similares)
                 if nombres_similares:
                     final['obs_tipo'] = 'SIMILARES'
                     final['obs_descripcion'] = nombres_similares
