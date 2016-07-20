@@ -36,6 +36,7 @@ if sys.argv[2]:
 if sys.argv[3]:
     importable = sys.argv[3]
 
+
 class AutoVivification(dict):
     """Implementation of perl's autovivification feature.
     Crea claves no declaradas anteriormente en diccionarios anidados."""
@@ -352,7 +353,6 @@ def main():
                                            'sin observaciones')
             salida.append(final)
     campos += ['obs_tipo', 'obs_descripcion']
-    pdb.set_trace()
     escribirResultado(campos, salida)
 
 if __name__ == '__main__':
