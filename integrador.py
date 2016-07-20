@@ -284,18 +284,6 @@ def buscarSimilares(cadena, diccionario, maxdist, omitir):
     return similares
 
 
-def obtenerOpciones(autor, lista_opciones):
-    """Devuelve un tuple de unos y ceros para las opciones enumeradas en la
-    lista, según cómo hayan sido configuradas para el autor."""
-    valor_opciones = []
-    for opcion in lista_opciones:
-        if opcion in autor['opciones']:
-            valor_opciones.append(1)
-        else:
-            valor_opciones.append(0)
-    return tuple(valor_opciones)
-
-
 def conCoincidencia(campos, linea, diccionario):
     nombre_completo = simplificar('%s %s' % (linea['nombres'],
                                              linea['apellidos']))
