@@ -358,11 +358,27 @@ def sinCoincidencia(campos, linea, diccionario):
     return final
 
 
+def ordenados(primero, segundo):
+    ordenados = 0
+    primero_apellido = primero.split(', ')[0].replace(' ', '')
+    primero_nombre = primero.split(', ')[1].replace(' ', '')
+    segundo_apellido = segundo.split(', ')[0].replace(' ', '')
+    segundo_nombre = segundo.split(', ')[1].replace(' ', '')
+    if primero_apellido == segundo_apellido:
+        if primero_nombre == min(primero_nombre, segundo_nombre):
+            ordenados = 1
+    else:
+        if primero_apellido == min(primero_apellido, segundo_apellido):
+            ordenados = 1
+    return ordenados
+
+
 def main():
     salida = []
     campos, dicc_nids, dicc_autores = abrirDump(volcado)
     with open(resultados) as csvfile:
         csvreader = csv.DictReader(csvfile, delimiter=',', quotechar="'")
+        nombre_anterior = ', '
         for linea in csvreader:
             pendientes = []
             # si el nombre de campo no existe, crea uno vacío
@@ -380,11 +396,17 @@ def main():
             apellido = simplificar(linea['apellidos'])
             nombre = simplificar(linea['nombres'])
             nombre_completo = '%s %s' % (nombre, apellido)
+            apellido_nombre = '%s, %s' % (apellido, nombre)
             ignorar_conflictos = 'ignorar_conflictos' in linea['opciones']
+            ignorar_orden = 'ignorar_orden' in linea['opciones']
             nid = linea['nid']
             if pendientes:
                 final = hacerFinal(campos, linea, 'REVISION PENDIENTE',
                                    pendientes)
+            elif ((not ordenados(nombre_anterior, apellido_nombre) and
+                   not ignorar_orden)):
+                obs = '%s < %s' % (apellido_nombre, nombre_anterior)
+                final = hacerFinal(campos, linea, 'REVISAR ORDEN', obs)
             elif nid:
                 if nid == '0':
                     linea['nid'] = ''
@@ -396,6 +418,8 @@ def main():
                 final = conCoincidencia(campos, linea, dicc_autores)
             else:  # sin coincidencias
                 final = sinCoincidencia(campos, linea, dicc_autores)
+            if not pendientes:
+                nombre_anterior = apellido_nombre
             salida.append(final)
     campos += ['obs_tipo', 'obs_descripcion']
     escribirResultado(campos, salida)
