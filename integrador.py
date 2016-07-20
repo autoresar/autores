@@ -49,29 +49,31 @@ class AutoVivification(dict):
 
 
 def simplificar(texto):
-    """Convierte mayúsculas en minúsculas y simplifica caracteres especiales"""
+    """Convierte mayúsculas en minúsculas, simplifica caracteres especiales y
+    sustituye múltiples espacios por uno solo"""
     texto = texto.lower()
     texto = (unicodedata.normalize('NFD', texto).encode('ascii', 'ignore')
              .decode())
+    texto = re.sub(r'\s+', ' ', texto)
     return texto
 
 
 def obtenerVariantes(nombre, apellido, genero):
-    no_dividir = (r'de(?:\s+(?:la|las|los))?|del|'
+    no_dividir = (r'de(?:\s(?:la|las|los))?|del|'
                   'di|de(?:llo|lla|i|gli|lle)|'
-                  'von|van(?:\s+(?:de|der|den)?)')
-    primer_apellido = (r'(?P<primero>^(?:(?:%s)\s+)?\S*)' % no_dividir)
+                  'von|van(?:\s(?:de|der|den)?)')
+    primer_apellido = (r'(?P<primero>^(?:(?:%s)\s)?\S*)' % no_dividir)
     # ignora conjunción "y" después del primer apellido; si es mujer, también
     # ignora preposición "de":
     if genero == 'Mujer':
-        ultimos_apellidos = (r'\s+(?:y |de )?(?P<ultimos>.*)')
+        ultimos_apellidos = (r'\s(?:y |de )?(?P<ultimos>.*)')
     else:
-        ultimos_apellidos = (r'\s+(?:y )?(?P<ultimos>.*)')
+        ultimos_apellidos = (r'\s(?:y )?(?P<ultimos>.*)')
     patron_apellido = (r'^%s(?:%s)?$' % (primer_apellido, ultimos_apellidos))
     apellido = re.match(patron_apellido, apellido, re.IGNORECASE)
     primer_nombre = r'(?P<primero>\S*)'
     # ignora "de", "de la", "de las" y "de los" iniciales del segundo nombre
-    ultimos_nombres = r'\s+(?:de (?:la |las |los )?)?(?P<ultimos>.*)'
+    ultimos_nombres = r'\s(?:de (?:la |las |los )?)?(?P<ultimos>.*)'
     patron_nombre = (r'^%s(?:%s)?$' % (primer_nombre, ultimos_nombres))
     nombre = re.match(patron_nombre, nombre, re.IGNORECASE)
     # para evitar duplicados, sólo nombre/apellido completo a la lista de
@@ -353,6 +355,7 @@ def main():
                                            'sin observaciones')
             salida.append(final)
     campos += ['obs_tipo', 'obs_descripcion']
+    pdb.set_trace()
     escribirResultado(campos, salida)
 
 if __name__ == '__main__':
