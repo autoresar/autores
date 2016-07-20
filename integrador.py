@@ -262,27 +262,24 @@ def compararVariantes(autor, diccionario_variantes):
     return posibles_autores
 
 
-def buscarSimilares(cadena, diccionario, maxdist, ignorar_similares):
+def buscarSimilares(cadena, diccionario, maxdist, omitir):
     """Buscar cadenas similares a la cadena entre las claves del diccionario,
     con distancias de edición de Levinshtein menor o iguales a maxdist"""
-    if not ignorar_similares:
-        nombres = diccionario.keys()
-        mindist = maxdist
-        nombres_similares = []
-        for nombre in nombres:
-            distancia = Levenshtein.distance(cadena, nombre)
-            if distancia == mindist:
-                nombres_similares.append(nombre)
-            elif distancia < mindist:
-                nombres_similares = [nombre]
-                mindist = distancia
+    nombres = diccionario.keys()
+    nombres_similares = []
+    for nombre in nombres:
+        distancia = Levenshtein.distance(cadena, nombre)
+        if distancia <= maxdist:
+            nombres_similares.append(nombre)
     similares = []
     for nombre in nombres_similares:
         for ano in diccionario[nombre]:
             for nid in diccionario[nombre][ano]:
-                similar = diccionario[nombre][ano][nid]
-                similares.append('%s %s (#%s)' % (similar['nombres'],
-                                                  similar['apellidos'], nid))
+                if nid not in omitir:
+                    similar = diccionario[nombre][ano][nid]
+                    similares.append('%s %s (#%s)' % (similar['nombres'],
+                                                      similar['apellidos'],
+                                                      nid))
     similares = ', '.join(similares)
     return similares
 
@@ -299,63 +296,108 @@ def obtenerOpciones(autor, lista_opciones):
     return tuple(valor_opciones)
 
 
+def conCoincidencia(campos, linea, diccionario):
+    nombre_completo = simplificar('%s %s' % (linea['nombres'],
+                                             linea['apellidos']))
+    coincidencia = diccionario[nombre_completo]
+    omitir = linea['omitir'].replace(' ', '').split(',')
+    ignorar_conflictos = 'ignorar_conflictos' in linea['opciones']
+    ano_nacimiento = linea['ano_nacimiento']
+    for ano in list(coincidencia.keys()):
+        for nid in list(coincidencia[ano].keys()):
+            if nid in omitir:
+                del coincidencia[ano][nid]
+        if len(coincidencia[ano]) == 0:
+            del coincidencia[ano]
+    if coincidencia:
+        if ano_nacimiento in coincidencia:
+            viejos = coincidencia[ano_nacimiento]
+            if len(viejos) == 1:
+                viejo = list(viejos.values())[0]
+                final = combinar(campos, linea, viejo, ignorar_conflictos)
+            else:
+                otros = []
+                for viejo in viejos.values():
+                    otros.append('%s %s (#%s)' % (viejo['nombres'],
+                                                  viejo['apellidos'],
+                                                  viejo['nid']))
+                otros = ', '.join(otros)
+                final = hacerFinal(campos, linea, '>1 AUTOR =NAC', otros)
+        else:
+            otros_anos = []
+            for ano in coincidencia:
+                otros = []
+                for nid in coincidencia[ano]:
+                    otro = coincidencia[ano][nid]
+                    otros.append('%s %s (#%s)' % (otro['nombres'],
+                                                  otro['apellidos'],
+                                                  otro['nid']))
+                otros = ano + ': ' + ', '.join(otros)
+                otros_anos.append(otros)
+            otros_anos = ', '.join(otros_anos)
+            final = hacerFinal(campos, linea, 'OTROS NAC', otros_anos)
+    else:
+        final = sinCoincidencia(campos, linea, diccionario)
+    return final
+
+
+def sinCoincidencia(campos, linea, diccionario):
+    nombre_completo = simplificar('%s %s' % (linea['nombres'],
+                                             linea['apellidos']))
+    omitir = linea['omitir'].replace(' ', '').split(',')
+    nombres_similares = buscarSimilares(nombre_completo, diccionario, 2,
+                                        omitir)
+    if nombres_similares:
+        final = hacerFinal(campos, linea, 'SIMILARES', nombres_similares)
+    else:  # si no se encuentra un nombre similar
+        variantes = 'sin variantes'
+        if variantes != 'sin variantes':
+            final = hacerFinal(campos, linea, 'VARIANTES', variantes)
+        else:  # si no se encuentra nombre similar ni variante
+            final = hacerFinal(campos, linea, 'NUEVO', 'sin observaciones')
+    return final
+
+
 def main():
     salida = []
     campos, dicc_nids, dicc_autores = abrirDump(volcado)
     with open(resultados) as csvfile:
         csvreader = csv.DictReader(csvfile, delimiter=',', quotechar="'")
         for linea in csvreader:
+            pendientes = []
             # si el nombre de campo no existe, crea uno vacío
             for campo in campos:
                 if not campo in linea:
                     linea[campo] = ''
+                inicio = linea[campo][:4]
+                if inicio == 'OBS:' or inicio == 'ERR:':
+                    pendientes.append(campo)
+            pendientes = ', '.join(pendientes)
             if not linea['ano_nacimiento']:
                 linea['ano_nacimiento'] = linea['fecha_nacimiento'][-4:]
             if not linea['ano_muerte']:
                 linea['ano_muerte'] = linea['ano_muerte'][-4:]
-            # obtiene la configuración de las opciones:
-            (forzar_nuevo,
-             ignorar_conflictos,
-             ignorar_similares) = obtenerOpciones(linea, ['forzar_nuevo',
-                                                  'ignorar_conflictos',
-                                                  'ignorar_similares'])
             apellido = simplificar(linea['apellidos'])
             nombre = simplificar(linea['nombres'])
             nombre_completo = '%s %s' % (nombre, apellido)
-            ano_nacimiento = linea['ano_nacimiento']
-            if forzar_nuevo:
-                final = hacerFinal(campos, linea, 'NUEVO', 'forzado')
-            elif nombre_completo in dicc_autores:
-                if ano_nacimiento in dicc_autores[nombre_completo]:
-                    viejos = dicc_autores[nombre_completo][ano_nacimiento]
-                    if len(viejos) < 2:
-                        viejo = list(viejos.values())[0]
-                        final = combinar(campos, linea, viejo,
-                                         ignorar_conflictos)
-                    else:  # si más de un autor con mismo nombre y nacimiento
-                        final = hacerFinal(campos, linea, '>1 AUTOR =NAC', '')
-                else:  # si más de un autor con mismo nombre completo
-                    otros_anos = ' / '.join(dicc_autores[nombre_completo]
-                                            .keys())
-                    final = hacerFinal(campos, linea, 'OTROS NAC', otros_anos)
-            else:  # si no se encuentra autor con mismo nombre
-                nombres_similares = buscarSimilares(nombre_completo,
-                                                    dicc_autores, 2,
-                                                    ignorar_similares)
-                if nombres_similares:
-                    final = hacerFinal(campos, linea, 'SIMILARES',
-                                       nombres_similares)
-                else:  # si no se encuentra un nombre similar
-                    variantes = 'sin variantes'
-                    if variantes != 'sin variantes':
-                        final = hacerFinal(campos, linea, 'VARIANTES',
-                                           variantes)
-                    else:  # si no se encuentra nombre similar ni variante
-                        final = hacerFinal(campos, linea, 'NUEVO',
-                                           'sin observaciones')
+            ignorar_conflictos = 'ignorar_conflictos' in linea['opciones']
+            nid = linea['nid']
+            if pendientes:
+                final = hacerFinal(campos, linea, 'REVISION PENDIENTE',
+                                   pendientes)
+            elif nid:
+                if nid == '0':
+                    linea['nid'] = ''
+                    final = hacerFinal(campos, linea, 'NUEVO', 'forzado')
+                else:
+                    viejo = dicc_nids[nid]
+                    final = combinar(campos, linea, viejo, ignorar_conflictos)
+            elif nombre_completo in dicc_autores:  # con coincidencias
+                final = conCoincidencia(campos, linea, dicc_autores)
+            else:  # sin coincidencias
+                final = sinCoincidencia(campos, linea, dicc_autores)
             salida.append(final)
     campos += ['obs_tipo', 'obs_descripcion']
-    pdb.set_trace()
     escribirResultado(campos, salida)
 
 if __name__ == '__main__':
