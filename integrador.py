@@ -56,21 +56,21 @@ def simplificar(texto):
 
 
 def obtenerVariantes(nombre, apellido, genero):
-    no_dividir = (r'de(?:\s(?:la|las|los))?|del|'
+    no_dividir = (r'de(?:\s+(?:la|las|los))?|del|'
                   'di|de(?:llo|lla|i|gli|lle)|'
-                  'von|van(?:\s(?:de|der|den)?)')
-    primer_apellido = (r'(?P<primero>^(?:(?:%s)\s)?\S*)' % no_dividir)
+                  'von|van(?:\s+(?:de|der|den)?)')
+    primer_apellido = (r'(?P<primero>^(?:(?:%s)\s+)?\S*)' % no_dividir)
     # ignora conjunción "y" después del primer apellido; si es mujer, también
     # ignora preposición "de":
     if genero == 'Mujer':
-        ultimos_apellidos = (r'\s(?:y |de )?(?P<ultimos>.*$)')
+        ultimos_apellidos = (r'\s+(?:y |de )?(?P<ultimos>.*)')
     else:
-        ultimos_apellidos = (r'\s(?:y )?(?P<ultimos>.*$)')
+        ultimos_apellidos = (r'\s+(?:y )?(?P<ultimos>.*)')
     patron_apellido = (r'^%s(?:%s)?$' % (primer_apellido, ultimos_apellidos))
     apellido = re.match(patron_apellido, apellido, re.IGNORECASE)
     primer_nombre = r'(?P<primero>\S*)'
     # ignora "de", "de la", "de las" y "de los" iniciales del segundo nombre
-    ultimos_nombres = r'\s(?:de (?:la |las |los )?)?(?P<ultimos>.*)'
+    ultimos_nombres = r'\s+(?:de (?:la |las |los )?)?(?P<ultimos>.*)'
     patron_nombre = (r'^%s(?:%s)?$' % (primer_nombre, ultimos_nombres))
     nombre = re.match(patron_nombre, nombre, re.IGNORECASE)
     # para evitar duplicados, sólo nombre/apellido completo a la lista de
@@ -93,8 +93,8 @@ def obtenerVariantes(nombre, apellido, genero):
 
 
 def abrirDump(filename):
-    arbol = AutoVivification()
-    diccionario_variantes = {}
+    nids = {}
+    autores = AutoVivification()
     with open(filename) as csvfile:
         csvreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
         campos = csvreader.fieldnames
@@ -102,41 +102,29 @@ def abrirDump(filename):
             # si años de nacimiento o de muerte no están disponibles, intenta
             # obtenerlos de las fechas de nacimiento o de muerte:
             if not linea['ano_nacimiento']:
-                if linea['fecha_nacimiento']:
-                    linea['ano_nacimiento'] = linea['fecha_nacimiento'][-4:]
-                else:
-                    linea['ano_nacimiento'] = 'sin año de nacimiento'
+                linea['ano_nacimiento'] = linea['fecha_nacimiento'][-4:]
             if not linea['ano_muerte']:
                 linea['ano_muerte'] = linea['ano_muerte'][-4:]
 
-            apellido = linea['apellidos']
-            nombre = linea['nombres']
-            # los nombres completos se obtienen como "nombre apellido" porque
-            # así es como están cargadas las variantes de nombre.
+            nid = linea['nid']
+            nids[nid] = linea
+            # se simplifican mayúsuclas y caracteres especiales:
+            apellido = simplificar(linea['apellidos'])
+            nombre = simplificar(linea['nombres'])
+            variantes = simplificar(linea['variantes'])
             nombre_completo = '%s %s' % (nombre, apellido)
-            # se simplifican mayúsculas y caracteres especiales del nombre
-            # completo para garantizar la identifiación de autores duplicados:
-            nombre_completo = simplificar(nombre_completo)
-            ano_nacimiento = linea['ano_nacimiento']
-            if ano_nacimiento in arbol[nombre_completo]:
-                arbol[nombre_completo][ano_nacimiento].append(linea)
-            else:
-                arbol[nombre_completo][ano_nacimiento] = [linea]
-            # obtiene variantes del nombre y agrega info del autor al
-            # diccionario de variantes:
             genero = linea['genero']
-            variantes = set(linea['variantes'].split('|'))
-            variantes |= set(obtenerVariantes(nombre, apellido, genero))
-            for variante in variantes:
-                variante = variante.lower()
-                info_autor = {'nid': linea['nid'],
-                              'nombre': '%s %s' % (nombre, apellido),
-                              'ano': ano_nacimiento}
-                if variante in diccionario_variantes:
-                    diccionario_variantes[variante].append(info_autor)
-                elif variante:
-                    diccionario_variantes[variante] = [info_autor]
-    return campos, arbol, diccionario_variantes
+            if linea['ano_nacimiento']:
+                ano_nacimiento = linea['ano_nacimiento']
+            else:
+                ano_nacimiento = 'sin año de nacimiento'
+            nombres = set([nombre_completo])
+            nombres |= set(variantes.split('|'))
+            nombres |= set(obtenerVariantes(nombre, apellido, genero))
+
+            for nombre in nombres:
+                autores[nombre][ano_nacimiento][nid] = nids[nid]
+    return campos, nids, autores
 
 
 def verConflictos(nuevo, viejo, ignorar_conflictos):
@@ -192,35 +180,52 @@ def separarEnlaces(autor):
     return titulos, urls
 
 
-def combinar(campos, nuevo, viejo):
-    """Devuelve la combinación de nuevo y viejo en los campos indicados, y una
-    lista de las adiciones realizadas."""
+def hacerFinal(campos, linea, tipo, obs):
+    """Transforma la línea al formato final"""
     final = {}
-    adiciones = []
+    for campo in campos:
+        final[campo] = linea[campo]
+    final['obs_tipo'] = tipo
+    final['obs_descripcion'] = obs
+    return final
+
+
+def combinar(campos, nuevo, viejo, ignorar_conflictos):
+    """Devuelve la combinación de nuevo y viejo en los campos indicados"""
+    final = {}
     lista_campos = campos[:]
-    # fusiona los campos enlaces antes de combinar:
-    lista_campos.remove('enlaces_titulo')
-    lista_campos.remove('enlaces_url')
-    lista_campos.append('enlaces')
-    nuevo['enlaces'] = fusionarEnlaces(nuevo)
-    viejo['enlaces'] = fusionarEnlaces(viejo)
-    for campo in lista_campos:
-        campo_nuevo = set()
-        campo_viejo = set()
-        if nuevo[campo]:
-            campo_nuevo = set(nuevo[campo].split('|'))
-        if viejo[campo]:
-            campo_viejo = set(viejo[campo].split('|'))
-        adicion = '|'.join(campo_nuevo - campo_viejo)
-        if adicion:
-            adiciones.append('%s: %s' % (campo, adicion))
-        final[campo] = '|'.join(campo_nuevo | campo_viejo)
-    if not adiciones:
-        adiciones = ['sin adiciones']
-    adiciones = ', '.join(adiciones)
-    # separa el campo enlaces antes de devolver resultado final:
-    final['enlaces_titulo'], final['enlaces_url'] = separarEnlaces(final)
-    return final, adiciones
+    conflictos, viejo = verConflictos(nuevo, viejo, ignorar_conflictos)
+    if conflictos == 'sin conflictos':
+        adiciones = []
+        # fusiona los campos enlaces antes de combinar:
+        lista_campos.remove('enlaces_titulo')
+        lista_campos.remove('enlaces_url')
+        lista_campos.append('enlaces')
+        nuevo['enlaces'] = fusionarEnlaces(nuevo)
+        viejo['enlaces'] = fusionarEnlaces(viejo)
+        for campo in lista_campos:
+            campo_nuevo = set()
+            campo_viejo = set()
+            if nuevo[campo]:
+                campo_nuevo = set(nuevo[campo].split('|'))
+            if viejo[campo]:
+                campo_viejo = set(viejo[campo].split('|'))
+            adicion = '|'.join(campo_nuevo - campo_viejo)
+            if adicion:
+                adiciones.append('%s: %s' % (campo, adicion))
+            final[campo] = '|'.join(campo_nuevo | campo_viejo)
+        if not adiciones:
+            adiciones = ['sin adiciones']
+        adiciones = ', '.join(adiciones)
+        # separa el campo enlaces antes de devolver resultado final:
+        final['enlaces_titulo'], final['enlaces_url'] = separarEnlaces(final)
+        final['obs_tipo'] = 'ADICIONES'
+        final['obs_descripcion'] = adiciones
+    else:  # si hay conflictos
+        conflictos = ('conflictos con %s %s (#%s): %s' % (viejo['nombres'],
+                      viejo['apellidos'], viejo['nid'], conflictos))
+        final = hacerFinal(campos, nuevo, 'CONFLICTOS', conflictos)
+    return final
 
 
 def escribirResultado(campos, autores):
@@ -257,16 +262,24 @@ def compararVariantes(autor, diccionario_variantes):
 def buscarSimilares(cadena, diccionario, maxdist, ignorar_similares):
     """Buscar cadenas similares a la cadena entre las claves del diccionario,
     con distancias de edición de Levinshtein menor o iguales a maxdist"""
-    similares = []
     if not ignorar_similares:
         nombres = diccionario.keys()
         mindist = maxdist
+        nombres_similares = []
         for nombre in nombres:
             distancia = Levenshtein.distance(cadena, nombre)
             if distancia == mindist:
-                similares.append(nombre.title())
+                nombres_similares.append(nombre)
             elif distancia < mindist:
-                similares = [nombre.title()]
+                nombres_similares = [nombre]
+                mindist = distancia
+    similares = []
+    for nombre in nombres_similares:
+        for ano in diccionario[nombre]:
+            for nid in diccionario[nombre][ano]:
+                similar = diccionario[nombre][ano][nid]
+                similares.append('%s %s (#%s)' % (similar['nombres'],
+                                                  similar['apellidos'], nid))
     similares = ', '.join(similares)
     return similares
 
@@ -285,72 +298,61 @@ def obtenerOpciones(autor, lista_opciones):
 
 def main():
     salida = []
-    campos, dump, diccionario_variantes = abrirDump(volcado)
+    campos, dicc_nids, dicc_autores = abrirDump(volcado)
     with open(resultados) as csvfile:
         csvreader = csv.DictReader(csvfile, delimiter=',', quotechar="'")
         for linea in csvreader:
-            nuevo = linea
+            # si el nombre de campo no existe, crea uno vacío
+            for campo in campos:
+                if not campo in linea:
+                    linea[campo] = ''
+            if not linea['ano_nacimiento']:
+                linea['ano_nacimiento'] = linea['fecha_nacimiento'][-4:]
+            if not linea['ano_muerte']:
+                linea['ano_muerte'] = linea['ano_muerte'][-4:]
             # obtiene la configuración de las opciones:
             (forzar_nuevo,
              ignorar_conflictos,
-             ignorar_similares) = obtenerOpciones(nuevo, ['forzar_nuevo',
+             ignorar_similares) = obtenerOpciones(linea, ['forzar_nuevo',
                                                   'ignorar_conflictos',
                                                   'ignorar_similares'])
-            # si el nombre de campo no existe, crea uno vacío
-            for campo in campos:
-                if not campo in nuevo:
-                    nuevo[campo] = ''
-            # para construir el diccionario de nombres, se pasan a minúsculas
-            # para evitar que no coincidan por simple diferencia de mayúsculas/
-            # minúsculas:
-            apellido = nuevo['apellidos']
-            nombre = nuevo['nombres']
+            apellido = simplificar(linea['apellidos'])
+            nombre = simplificar(linea['nombres'])
             nombre_completo = '%s %s' % (nombre, apellido)
-            # simplifica mayúsculas y caracteres especiales del nombre completo
-            # con el que se buscará en el diccionario de autores precargados:
-            nombre_completo = simplificar(nombre_completo)
-            ano_nacimiento = nuevo['ano_nacimiento']
-            final, _ = combinar(campos, nuevo, nuevo)
+            ano_nacimiento = linea['ano_nacimiento']
             if forzar_nuevo:
-                final['obs_tipo'] = 'NUEVO'
-                final['obs_descripcion'] = 'forzado'
-            elif nombre_completo in dump:
-                if ano_nacimiento in dump[nombre_completo]:
-                    autores_viejos = dump[nombre_completo][ano_nacimiento]
-                    if len(autores_viejos) < 2:
-                        viejo = autores_viejos[0]
-                        conflictos, viejo = verConflictos(nuevo, viejo,
-                                                          ignorar_conflictos)
-                        if conflictos == 'sin conflictos':
-                            final, adiciones = combinar(campos, nuevo, viejo)
-                            final['obs_tipo'] = 'ADICIONES'
-                            final['obs_descripcion'] = adiciones
-                        else:  # si hay conflictos
-                            final['obs_tipo'] = 'CONFLICTOS'
-                            final['obs_descripcion'] = conflictos
+                final = hacerFinal(campos, linea, 'NUEVO', 'forzado')
+            elif nombre_completo in dicc_autores:
+                if ano_nacimiento in dicc_autores[nombre_completo]:
+                    viejos = dicc_autores[nombre_completo][ano_nacimiento]
+                    if len(viejos) < 2:
+                        viejo = list(viejos.values())[0]
+                        final = combinar(campos, linea, viejo,
+                                         ignorar_conflictos)
                     else:  # si más de un autor con mismo nombre y nacimiento
-                        final['obs_tipo'] = '>1 AUTOR MISMO NACIMIENTO'
-                        final['obs_descripcion'] = ''
+                        final = hacerFinal(campos, linea, '>1 AUTOR =NAC', '')
                 else:  # si más de un autor con mismo nombre completo
-                    otros_anos = ' / '.join(dump[nombre_completo].keys())
-                    final['obs_tipo'] = 'OTROS NACIMIENTOS'
-                    final['obs_descripcion'] = otros_anos
+                    otros_anos = ' / '.join(dicc_autores[nombre_completo]
+                                            .keys())
+                    final = hacerFinal(campos, linea, 'OTROS NAC', otros_anos)
             else:  # si no se encuentra autor con mismo nombre
-                nombres_similares = buscarSimilares(nombre_completo, dump, 2,
+                nombres_similares = buscarSimilares(nombre_completo,
+                                                    dicc_autores, 2,
                                                     ignorar_similares)
                 if nombres_similares:
-                    final['obs_tipo'] = 'SIMILARES'
-                    final['obs_descripcion'] = nombres_similares
+                    final = hacerFinal(campos, linea, 'SIMILARES',
+                                       nombres_similares)
                 else:  # si no se encuentra un nombre similar
-                    variantes = compararVariantes(nuevo, diccionario_variantes)
+                    variantes = 'sin variantes'
                     if variantes != 'sin variantes':
-                        final['obs_tipo'] = 'VARIANTES'
-                        final['obs_descripcion'] = variantes
+                        final = hacerFinal(campos, linea, 'VARIANTES',
+                                           variantes)
                     else:  # si no se encuentra nombre similar ni variante
-                        final['obs_tipo'] = 'NUEVO'
-                        final['obs_descripcion'] = 'sin observaciones'
+                        final = hacerFinal(campos, linea, 'NUEVO',
+                                           'sin observaciones')
             salida.append(final)
     campos += ['obs_tipo', 'obs_descripcion']
+    pdb.set_trace()
     escribirResultado(campos, salida)
 
 if __name__ == '__main__':
