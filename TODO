@@ -37,3 +37,12 @@ HECHO - Modificar autores e integrador para que planilla resultados incluya una
         columna nid. Permitirá reemplazar la opción forzar_nuevo (nid=0) y más
         importantemente permitirá forzar una coincidencia (por ejemplo, si hay dos
         autores con mismo nombre y año de nacimiento).
+
+Extractor:
+HECHO- GRAVE: La función validar_lugar asigna "Capital Federal" si sitio de nacimiento es
+   "Buenos Aires". Sin embargo, si hubo un error de reconocimiento "Buenos
+   Ames", por ejemplo, no sería automáticamente identificado como "Capital
+   Federal", y sería reconocido como Provincia de Buenos Aires.
+ - Algo similar al punto anterior sucede con la remoción de "Provincia de". Si
+   hubo un error de OCR, no se va a remover adecuadamente y la validación de
+   la provincia podría no funcionar o funcionar mal.

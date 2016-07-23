@@ -121,20 +121,33 @@ def confianzaMinima(posicion_inicial, posicion_final, diccionario_confianza):
 
 
 def validar_lugar(sitio, provincias, capitales, paises):
-    if sitio == 'Buenos Aires': sitio = 'Capital Federal'  # si el texto identificado como provincia es sólo 'Buenos Aires', lo cambia por CABA
-    sitio = re.sub(r'^Provincia\s*De\s*', '', sitio, flags=re.IGNORECASE)  # elimina fragmento 'Provincia de ' al principio del texto identificado como provincia
-    umbral = .8
-    if difflib.get_close_matches(sitio, provincias.keys(), n=1, cutoff=umbral):
-        provincia = difflib.get_close_matches(sitio, provincias.keys(), n=1, cutoff=umbral)[0]
-        sitio_valido = provincias[provincia]
-    elif difflib.get_close_matches(sitio, capitales.keys(), n=1, cutoff=umbral):
-        capital = difflib.get_close_matches(sitio, capitales.keys(), n=1, cutoff=umbral)[0]
-        sitio_valido = capitales[capital]
-    elif difflib.get_close_matches(sitio, paises.keys(), n=1, cutoff=umbral):
-        pais = difflib.get_close_matches(sitio, paises.keys(), n=1, cutoff=umbral)[0]
-        sitio_valido = paises[pais]
+    # sustituye "Buenos Aires" por CABA:
+    if difflib.SequenceMatcher(None, sitio, 'Buenos Aires').ratio() > .7:
+        if sitio == 'Buenos Aires':
+            sitio_valido = 'Capital Federal'
+        else:
+            sitio_valido = 'OBS: ' + sitio
     else:
-        sitio_valido = 'OBS: ' + sitio
+        # elimina fragmento 'Provincia de ':
+        sitio = re.sub(r'^Provincia\s*De\s*', '', sitio, flags=re.IGNORECASE)
+        umbral = .8
+        if difflib.get_close_matches(sitio, provincias.keys(), n=1,
+                                     cutoff=umbral):
+            provincia = difflib.get_close_matches(sitio, provincias.keys(),
+                                                  n=1, cutoff=umbral)[0]
+            sitio_valido = provincias[provincia]
+        elif difflib.get_close_matches(sitio, capitales.keys(), n=1,
+                                       cutoff=umbral):
+            capital = difflib.get_close_matches(sitio, capitales.keys(), n=1,
+                                                cutoff=umbral)[0]
+            sitio_valido = capitales[capital]
+        elif difflib.get_close_matches(sitio, paises.keys(), n=1,
+                                       cutoff=umbral):
+            pais = difflib.get_close_matches(sitio, paises.keys(), n=1,
+                                             cutoff=umbral)[0]
+            sitio_valido = paises[pais]
+        else:
+            sitio_valido = 'OBS: ' + sitio
     return sitio_valido
 
 blocks = []
@@ -369,20 +382,13 @@ for blocknum, block in enumerate(blocks):
                    oracion, discip, subdiscip))
 
 f = open(resultados, 'w')
-f.write("'#','página','nombres','seudonimos','apellidos','genero',"
-        "'nombre_conf','seudon_conf','apellido_conf',"
-        "'sitio','lugar_nacimiento','ano_nacimiento','ano_muerte',"
-        "'nacim_conf','muerte_conf',"
-        "'oracion','disciplinas','subdisciplinas',"
-        "'fuentes','notas','nid','opciones','omitir'\n")
-for i, author in enumerate(result):
-    line = str(i+1) + ','
-    line += ("'%s','%s','%s','%s','%s',"
-             "'%s','%s','%s',"
-             "'%s','%s','%s','%s',"
-             "'%s','%s',"
-             "'%s','%s','%s'," % author)
-    line += "'%s',,,," % fuente
+f.write("'página','nombres','seudonimos','apellidos','genero','name_conf','nick_conf','lastname_conf',"
+        "'bplace','lugar_nacimiento','ano_nacimiento','ano_muerte','byear_conf','dyear_conf',"
+        "'primera_oración','disciplinas','subdisciplinas',"
+        "'fuentes','notas','opciones'\n")
+for author in result:
+    line = "'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s'," % author
+    line += "'%s',," % fuente
     f.write(line+'\n')
 f.close()
 
