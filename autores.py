@@ -382,13 +382,20 @@ for blocknum, block in enumerate(blocks):
                    oracion, discip, subdiscip))
 
 f = open(resultados, 'w')
-f.write("'página','nombres','seudonimos','apellidos','genero','name_conf','nick_conf','lastname_conf',"
-        "'bplace','lugar_nacimiento','ano_nacimiento','ano_muerte','byear_conf','dyear_conf',"
-        "'primera_oración','disciplinas','subdisciplinas',"
-        "'fuentes','notas','opciones'\n")
-for author in result:
-    line = "'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s'," % author
-    line += "'%s',," % fuente
+f.write("'#','página','nombres','seudonimos','apellidos','genero',"
+        "'nombre_conf','seudon_conf','apellido_conf',"
+        "'sitio','lugar_nacimiento','ano_nacimiento','ano_muerte',"
+        "'nacim_conf','muerte_conf',"
+        "'oracion','disciplinas','subdisciplinas',"
+        "'fuentes','notas','nid','opciones','omitir'\n")
+for i, author in enumerate(result):
+    line = str(i+1) + ','
+    line += ("'%s','%s','%s','%s','%s',"
+             "'%s','%s','%s',"
+             "'%s','%s','%s','%s',"
+             "'%s','%s',"
+             "'%s','%s','%s'," % author)
+    line += "'%s',,,," % fuente
     f.write(line+'\n')
 f.close()
 
