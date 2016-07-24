@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """integrador.py resultados volcado salida
 Integra el resultado devuelto por autores.py con el último volcado
 de la base.
