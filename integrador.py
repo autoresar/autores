@@ -26,6 +26,7 @@ import unicodedata
 import Levenshtein
 import sys
 
+taxonomia = 'taxonomia.csv'
 resultados = 'output/resultados.csv'
 volcado = 'output/dbdump.csv'
 importable = 'output/importame.csv'
@@ -361,6 +362,29 @@ def ordenados(primero, segundo):
     return ordenados
 
 
+def validar(final):
+    vocabularios = {}
+    validacion = []
+    with open(taxonomia) as csvfile:
+        csvreader = csv.DictReader(csvfile)
+        for linea in csvreader:
+            if linea['vocabulario'] in vocabularios:
+                vocabularios[linea['vocabulario']].append(linea['termino'])
+            else:
+                vocabularios[linea['vocabulario']] = [linea['termino']]
+    for campo in final:
+        if campo in vocabularios:
+            if final[campo]:
+                for termino in final[campo].split('|'):
+                    if termino not in vocabularios[campo]:
+                        validacion.append('%s: %s' % (campo, termino))
+    if validacion:
+        validacion = 'Términos inválidos: ' + ', '.join(validacion)
+    else:
+        validacion = 'OK'
+    return validacion
+
+
 def main():
     salida = []
     campos, dicc_nids, dicc_autores = abrirDump(volcado)
@@ -408,8 +432,9 @@ def main():
                 final = sinCoincidencia(campos, linea, dicc_autores)
             if not pendientes:
                 nombre_anterior = apellido_nombre
+            final['validacion'] = validar(final)
             salida.append(final)
-    campos += ['obs_tipo', 'obs_descripcion']
+    campos += ['obs_tipo', 'obs_descripcion', 'validacion']
     escribirResultado(campos, salida)
 
 if __name__ == '__main__':
