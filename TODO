@@ -2,8 +2,7 @@ HECHO- Agregar disciplina por default (Escritura para Breve Diccionario).
 
 - Update or replace existing nodos (using "unique target" mappings)
 HECHO- Hay que cambiar género a "Hombre" o "Mujer"
-- Tengo que revisar la lista de países cargados en el sitio y usarla para la validación:
-Si el autor nació en un país no precargado en la taxonomía correspondiente, no se va a importar esa información y no nos vamos a enterar. Tengo tres opciones, en orden de mi preferencia: 1) activar opción autocrear en el importer (ya que el lugar de nacimiento es sometido a la validación de una lista de países válidos), 2) agregar más países a la taxonomía correspondiente, o 3) incorporar un paso extra de validación en el programa para que marque los países que no fueron precargados en la base.
+HECHO- Tengo que revisar la lista de países cargados en el sitio y usarla para la validación: Si el autor nació en un país no precargado en la taxonomía correspondiente, no se va a importar esa información y no nos vamos a enterar. Tengo tres opciones, en orden de mi preferencia: 1) activar opción autocrear en el importer (ya que el lugar de nacimiento es sometido a la validación de una lista de países válidos), 2) agregar más países a la taxonomía correspondiente, o 3) incorporar un paso extra de validación en el programa para que marque los países que no fueron precargados en la base.
 
 HECHO- Cambiar separador de disciplinas: "|"
 HECHO- Devolver código de subdisciplina (Eve tiene que confirmar si no cambiar nombre de subdisciplinas "otras").
