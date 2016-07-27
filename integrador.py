@@ -26,17 +26,25 @@ import re
 import unicodedata
 import Levenshtein
 import sys
+import os
 
 taxonomia = 'taxonomia.csv'
-resultados = 'output/resultados.csv'
-volcado = 'output/dbdump.csv'
-importable = 'output/importame.csv'
-if sys.argv[1]:
-    resultados = sys.argv[1]
-if sys.argv[2]:
-    volcado = sys.argv[2]
-if sys.argv[3]:
-    importable = sys.argv[3]
+if len(sys.argv) < 4:
+    print('Modo de uso:\n'
+          '\tintegrador.py RESULTADOS VOLCADO IMPORTABLE\n\n'
+          'RESULTADOS: archivo csv devuelto por autores.py\n'
+          'VOLCADO: volcado de la base obtenido en '
+          'http://www.dominiopublico.org.ar/dbdump.csv\n'
+          'IMPORTABLE: nombre del archivo csv donde se escribirán los '
+          'resultados')
+    sys.exit()
+resultados = sys.argv[1]
+volcado = sys.argv[2]
+importable = sys.argv[3]
+if os.path.isfile(importable):
+    opcion = input(importable + ' ya existe. ¿Desea sobreescribirlo? (s/n): ')
+    if opcion != 's':
+        sys.exit()
 
 
 class AutoVivification(dict):

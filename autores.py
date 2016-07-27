@@ -28,13 +28,23 @@ import pdb
 import difflib
 import csv
 import unicodedata
+import os
 
-ocr = 'breve_diccionario.hocr'
-resultados = 'output/resultados.csv'
-if sys.argv[1]:
-    ocr = sys.argv[1]
-if sys.argv[2]:
-    resultados = sys.argv[2]
+
+if len(sys.argv) < 3:
+    print('Modo de uso:\n'
+          '\tautores.py FUENTE RESULTADOS\n\n'
+          'FUENTE: archivo hocr devuelto por el motor OCR\n'
+          'RESULTADOS: nombre del archivo csv donde se escribirán los '
+          'resultados')
+    sys.exit()
+ocr = sys.argv[1]
+resultados = sys.argv[2]
+if os.path.isfile(resultados):
+    opcion = input(resultados + ' ya existe. ¿Desea sobreescribirlo? (s/n): ')
+    if opcion != 's':
+        sys.exit()
+
 
 primera_pagina = 17
 discip_predet = 'Escritura'  # establece la disciplina predeterminada de la referencia
