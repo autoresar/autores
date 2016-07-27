@@ -64,3 +64,6 @@ HECHO- GRAVE: La función validar_lugar asigna "Capital Federal" si sitio de nac
 - El script integrador podría preguntar al usuario si descargó la última verticales
   sión de dbdump.csv y pedir que lo haga.
 - Observar "ERROR" si el usuario fuerza un match con un NID inexistente.
+- Agregar campos 'enlaces_titulo' y 'enlaces_url' a planilla resultados. Enton-
+  ces, deberían estar todos los campos de la planilla importame, más algunos
+  adicionales (confianza, número de página, etc)
