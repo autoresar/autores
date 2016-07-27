@@ -45,3 +45,7 @@ HECHO- GRAVE: La función validar_lugar asigna "Capital Federal" si sitio de nac
  - Algo similar al punto anterior sucede con la remoción de "Provincia de". Si
    hubo un error de OCR, no se va a remover adecuadamente y la validación de
    la provincia podría no funcionar o funcionar mal.
+
+- Estandarizar la salida csv de los scripts a dobles comillas como delimitador
+  de texto. Quizá podría sustituir todas las dobles comillas halladas en la
+  fuente original por comillas simples para no tener problemas.
