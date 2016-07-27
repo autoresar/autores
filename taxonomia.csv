@@ -5,7 +5,6 @@ disciplina,Fotografía
 disciplina,Artes visuales
 disciplina,Artes escénicas
 disciplina,Audiovisual
-subdisciplina,Nombre
 subdisciplina,Coreografía
 subdisciplina,Pantomima
 subdisciplina,Títeres/marionetas
@@ -38,7 +37,6 @@ subdisciplina,Autor de letra
 subdisciplina,Autor de música
 subdisciplina,Adaptación
 subdisciplina,Arreglos
-subdisciplina,Nombre
 lugar_nacimiento,Alemania
 lugar_nacimiento,Argentina
 lugar_nacimiento,Buenos Aires
@@ -113,7 +111,6 @@ lugar_nacimiento,Turquía
 lugar_nacimiento,Ucrania
 lugar_nacimiento,Uruguay
 lugar_nacimiento,Venezuela
-genero,Nombre
 genero,Hombre
 genero,Mujer
 enlaces_titulo,Internet Movie Database (IMDb)
