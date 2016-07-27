@@ -57,3 +57,9 @@ HECHO- GRAVE: La función validar_lugar asigna "Capital Federal" si sitio de nac
 - La base de datos crea un enlace vacío si el campo "enlace_titulo" tiene sólo
   un espacio? Si no es así, ignorar espacios en la validación de este (y otros)
   campo.
+- Diferenciar la rama para desarrollos de la rama master y crear ejecutables
+  para Windows.
+- Ver si hay una manera de que el archivo taxonomia.csv se genere automática-
+  mente de la base.
+- El script integrador podría preguntar al usuario si descargó la última verticales
+  sión de dbdump.csv y pedir que lo haga.
