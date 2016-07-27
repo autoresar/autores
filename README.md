@@ -7,12 +7,15 @@ Extrae la información de autores del "Breve diccionario biográfico de
 autores argentinos: desde 1940" en breve_diccionario.hocr.
 
 Modo de uso:
-  autores.py FUENTE RESULTADOS
+
+    autores.py FUENTE RESULTADOS
 
 FUENTE: archivo hocr devuelto por el motor OCR
+
 RESULTADOS: nombre del archivo csv donde se escribirán los resultados
 
 También usa la información en:
+
 * nombres.csv: una lista de nombres del Registro Civil de la Ciudad de Buenos
   Aires, con sus respectivos géneros.
 * disciplinas.csv: versión csv de disciplinas.ods, indica qué disciplinas y
@@ -24,11 +27,14 @@ También usa la información en:
 Integra el resultado devuelto por autores.py con el último volcado de la base.
 
 Modo de uso:
-	integrador.py RESULTADOS VOLCADO IMPORTABLE
+
+  	integrador.py RESULTADOS VOLCADO IMPORTABLE
 
 RESULTADOS: archivo csv devuelto por autores.py
+
 VOLCADO: volcado de la base obtenido en
          http://www.dominiopublico.org.ar/dbdump.csv
+
 IMPORTABLE: nombre del archivo csv donde se escribirán los resultados
 
 ## Instalación
