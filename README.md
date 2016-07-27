@@ -1,8 +1,8 @@
-### Proyecto autores.ar
+# Proyecto autores.ar
 
 ## Descripción
 
-# autores.py
+### autores.py
 Extrae la información de autores del "Breve diccionario biográfico de
 autores argentinos: desde 1940" en breve_diccionario.hocr.
 
@@ -20,7 +20,7 @@ También usa la información en:
 * lugares.csv: una lista de capitales, provincias y países usada para
   validación.
 
-# integrador.py
+### integrador.py
 Integra el resultado devuelto por autores.py con el último volcado de la base.
 
 Modo de uso:
