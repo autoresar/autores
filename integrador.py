@@ -152,7 +152,7 @@ def verConflictos(nuevo, viejo, ignorar_conflictos):
     # haber diferencias en el uso de las mayúsculas (que son ignoradas en la
     # identifiación de duplicados)
     foco = ['apellidos', 'nombres', 'genero', 'lugar_nacimiento',
-            'fecha_nacimiento', 'fecha_muerte', 'ano_muerte']
+            'fecha_nacimiento', 'ano_nacimiento', 'fecha_muerte', 'ano_muerte']
     for campo in foco:
         if campo in nuevo:
             campo_nuevo = nuevo[campo]
