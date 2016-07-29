@@ -108,7 +108,7 @@ def obtenerVariantes(nombre, apellido, genero):
 def abrirDump(filename):
     nids = {}
     autores = AutoVivification()
-    with open(filename) as csvfile:
+    with open(filename, encoding='utf-8') as csvfile:
         csvreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
         campos = csvreader.fieldnames
         for linea in csvreader:
@@ -397,7 +397,7 @@ def validar(final):
 def main():
     salida = []
     campos, dicc_nids, dicc_autores = abrirDump(volcado)
-    with open(resultados) as csvfile:
+    with open(resultados, encoding='utf-8') as csvfile:
         csvreader = csv.DictReader(csvfile, delimiter=',', quotechar="'")
         nombre_anterior = ', '
         for linea in csvreader:
