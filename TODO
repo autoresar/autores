@@ -50,13 +50,14 @@ HECHO- Estandarizar la salida csv de los scripts a dobles comillas como delimita
   de texto. Quizá podría sustituir todas las dobles comillas halladas en la
   fuente original por comillas simples para no tener problemas.
 HECHO- Integrador entiende D'Anna alfabéticamente anterior a Damiani. Corregir.
-- Si sólo hay espacios en algún campo, no integrador no debe intentar validarlo.
+HECHO- Si sólo hay espacios en algún campo, integrador no debe intentar validarlo:
+  sólo espacios en campos ahora son removidos.
 - Revisar que no haya conflictos de codificación si la planilla resultados se
   edita en Windows.
-- Marcar como conflicto múltiples enlaces con el mismo título de enlace.
-- La base de datos crea un enlace vacío si el campo "enlace_titulo" tiene sólo
+HECHO- Marcar como conflicto múltiples enlaces con el mismo título de enlace.
+HECHO- La base de datos crea un enlace vacío si el campo "enlace_titulo" tiene sólo
   un espacio? Si no es así, ignorar espacios en la validación de este (y otros)
-  campo.
+  campo: sólo espacios en campos ahora son removidos.
 - Diferenciar la rama para desarrollos de la rama master y crear ejecutables
   para Windows.
 - Ver si hay una manera de que el archivo taxonomia.csv se genere automática-

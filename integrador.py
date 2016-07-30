@@ -426,8 +426,10 @@ def ordenados(primero, segundo):
 
 
 def validar(final):
-    vocabularios = {}
     validacion = []
+    # términos inválidos por taxonomía:
+    vocabularios = {}
+    invalidos = []
     with open(taxonomia) as csvfile:
         csvreader = csv.DictReader(csvfile)
         for linea in csvreader:
@@ -440,10 +442,17 @@ def validar(final):
             if final[campo]:
                 for termino in final[campo].split('|'):
                     if termino not in vocabularios[campo]:
-                        validacion.append('%s: %s' % (campo, termino))
-    if validacion:
-        validacion = 'Términos inválidos: ' + ', '.join(validacion)
-    else:
+                        invalidos.append('%s: %s' % (campo, termino))
+    if invalidos:
+        validacion.append('Términos inválidos: ' + ', '.join(invalidos))
+    # múltiples enlaces del mismo tipo:
+    enlaces = final['enlaces_titulo'].split('|')
+    repetidos = set([enlace for enlace in enlaces
+                     if enlaces.count(enlace) > 1])
+    if repetidos:
+        validacion.append('Enlaces repetidos: ' + ', '.join(repetidos))
+    validacion = '; '.join(validacion)
+    if not validacion:
         validacion = 'OK'
     return validacion
 
