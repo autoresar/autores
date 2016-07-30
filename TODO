@@ -46,10 +46,10 @@ HECHO- GRAVE: La función validar_lugar asigna "Capital Federal" si sitio de nac
    hubo un error de OCR, no se va a remover adecuadamente y la validación de
    la provincia podría no funcionar o funcionar mal.
 
-- Estandarizar la salida csv de los scripts a dobles comillas como delimitador
+HECHO- Estandarizar la salida csv de los scripts a dobles comillas como delimitador
   de texto. Quizá podría sustituir todas las dobles comillas halladas en la
   fuente original por comillas simples para no tener problemas.
-- Integrador entiende D'Anna alfabéticamente anterior a Damiani. Corregir.
+HECHO- Integrador entiende D'Anna alfabéticamente anterior a Damiani. Corregir.
 - Si sólo hay espacios en algún campo, no integrador no debe intentar validarlo.
 - Revisar que no haya conflictos de codificación si la planilla resultados se
   edita en Windows.
@@ -67,3 +67,5 @@ HECHO- GRAVE: La función validar_lugar asigna "Capital Federal" si sitio de nac
 - Agregar campos 'enlaces_titulo' y 'enlaces_url' a planilla resultados. Enton-
   ces, deberían estar todos los campos de la planilla importame, más algunos
   adicionales (confianza, número de página, etc)
+- Verificador de orden alfabético debe considerar "de Sosa", "del Río" y
+  "de la Fuente" como una unidad, pero "Álvarez Jonte" como unidades separadas.
