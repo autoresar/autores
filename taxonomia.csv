@@ -1,42 +1,42 @@
 vocabulario,termino
-disciplina,Escritura
-disciplina,Música
-disciplina,Fotografía
-disciplina,Artes visuales
-disciplina,Artes escénicas
-disciplina,Audiovisual
-subdisciplina,Coreografía
-subdisciplina,Pantomima
-subdisciplina,Títeres/marionetas
-subdisciplina,Arquitectura
-subdisciplina,Cerámica
-subdisciplina,Dibujo
-subdisciplina,Escultura
-subdisciplina,Grabado
-subdisciplina,Orfebrería
-subdisciplina,Pintura
-subdisciplina,Tapiz
-subdisciplina,Otras artes visuales
-subdisciplina,Animación
-subdisciplina,Guionista
-subdisciplina,Intérprete
-subdisciplina,Productor
-subdisciplina,Dirección cinematográfica
-subdisciplina,Dirección televisiva
-subdisciplina,Otras artes audiovisuales
-subdisciplina,Crónica
-subdisciplina,Historietista
-subdisciplina,Dramaturgia
-subdisciplina,No ficción
-subdisciplina,Narrativa
-subdisciplina,Periodismo
-subdisciplina,Poesía
-subdisciplina,Traducción
-subdisciplina,Otras artes literarias
-subdisciplina,Autor de letra
-subdisciplina,Autor de música
-subdisciplina,Adaptación
-subdisciplina,Arreglos
+disciplinas,Escritura
+disciplinas,Música
+disciplinas,Fotografía
+disciplinas,Artes visuales
+disciplinas,Artes escénicas
+disciplinas,Audiovisual
+subdisciplinas,Coreografía
+subdisciplinas,Pantomima
+subdisciplinas,Títeres/marionetas
+subdisciplinas,Arquitectura
+subdisciplinas,Cerámica
+subdisciplinas,Dibujo
+subdisciplinas,Escultura
+subdisciplinas,Grabado
+subdisciplinas,Orfebrería
+subdisciplinas,Pintura
+subdisciplinas,Tapiz
+subdisciplinas,Otras artes visuales
+subdisciplinas,Animación
+subdisciplinas,Guionista
+subdisciplinas,Intérprete
+subdisciplinas,Productor
+subdisciplinas,Dirección cinematográfica
+subdisciplinas,Dirección televisiva
+subdisciplinas,Otras artes audiovisuales
+subdisciplinas,Crónica
+subdisciplinas,Historietista
+subdisciplinas,Dramaturgia
+subdisciplinas,No ficción
+subdisciplinas,Narrativa
+subdisciplinas,Periodismo
+subdisciplinas,Poesía
+subdisciplinas,Traducción
+subdisciplinas,Otras artes literarias
+subdisciplinas,Autor de letra
+subdisciplinas,Autor de música
+subdisciplinas,Adaptación
+subdisciplinas,Arreglos
 lugar_nacimiento,Alemania
 lugar_nacimiento,Argentina
 lugar_nacimiento,Buenos Aires
