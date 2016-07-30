@@ -43,7 +43,7 @@ volcado = sys.argv[2]
 importable = sys.argv[3]
 if os.path.isfile(importable):
     opcion = input(importable + ' ya existe. ¿Desea sobreescribirlo? (s/n): ')
-    if opcion != 's':
+    if opcion.lower() != 's':
         sys.exit()
 
 
@@ -299,7 +299,7 @@ def conCoincidencia(campos, linea, diccionario):
                                              linea['apellidos']))
     coincidencia = diccionario[nombre_completo]
     omitir = linea['omitir'].replace(' ', '').split(',')
-    ignorar_conflictos = 'ignorar_conflictos' in linea['opciones']
+    ignorar_conflictos = 'ignorar_conflictos' in linea['opciones'].lower()
     ano_nacimiento = linea['ano_nacimiento']
     for ano in list(coincidencia.keys()):
         for nid in list(coincidencia[ano].keys()):
@@ -466,8 +466,9 @@ def main():
             nombre = linea['nombres']
             nombre_completo = simplificar('%s %s' % (nombre, apellido))
             apellido_nombre = '%s, %s' % (apellido, nombre)
-            ignorar_conflictos = 'ignorar_conflictos' in linea['opciones']
-            ignorar_orden = 'ignorar_orden' in linea['opciones']
+            ignorar_conflictos = ('ignorar_conflictos'
+                                  in linea['opciones'].lower())
+            ignorar_orden = 'ignorar_orden' in linea['opciones'].lower()
             nid = linea['nid']
             if pendientes:
                 final = hacerFinal(campos, linea, 'REVISION PENDIENTE',

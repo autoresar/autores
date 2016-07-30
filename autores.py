@@ -42,7 +42,7 @@ ocr = sys.argv[1]
 resultados = sys.argv[2]
 if os.path.isfile(resultados):
     opcion = input(resultados + ' ya existe. ¿Desea sobreescribirlo? (s/n): ')
-    if opcion != 's':
+    if opcion.lower() != 's':
         sys.exit()
 
 
