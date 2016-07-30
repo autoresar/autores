@@ -492,6 +492,9 @@ def validar(final):
 
 
 def main():
+    print('\033[93m' + '\033[1m' + '\nRecuerde usar la versión más reciente '
+          'del volcado o dump de la base de datos\ndisponible en '
+          'http://dominiopublico.org.ar/dbdump.csv')
     salida = []
     campos, dicc_nids, dicc_autores = abrirDump(volcado)
     with open(resultados, encoding='utf-8') as csvfile:
