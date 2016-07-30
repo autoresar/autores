@@ -198,6 +198,9 @@ def hacerFinal(campos, linea, tipo, obs):
     final = {}
     for campo in campos:
         final[campo] = linea[campo]
+        # remueve espacios al principio y al final de cada elemento:
+        final[campo] = re.sub(r'^\s|(?<=\|)\s|\s(?=\|)|\s$', '',
+                              final[campo])
     final['obs_tipo'] = tipo
     final['obs_descripcion'] = obs
     return final
@@ -227,6 +230,9 @@ def combinar(campos, nuevo, viejo, ignorar_conflictos):
             if adicion:
                 adiciones.append('%s: %s' % (campo, adicion))
             final[campo] = '|'.join(campo_nuevo | campo_viejo)
+            # remueve espacios al principio y al final de cada elemento:
+            final[campo] = re.sub(r'^\s|(?<=\|)\s|\s(?=\|)|\s$', '',
+                                  final[campo])
         if not adiciones:
             adiciones = ['sin adiciones']
         adiciones = ', '.join(adiciones)
