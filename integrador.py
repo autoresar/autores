@@ -500,7 +500,7 @@ def main():
     with open(resultados, encoding='utf-8') as csvfile:
         csvreader = csv.DictReader(csvfile)
         nombre_anterior = ', '
-        for linea in csvreader:
+        for orden, linea in enumerate(csvreader):
             pendientes = []
             # si el nombre de campo no existe, crea uno vacío
             for campo in campos:
@@ -546,8 +546,13 @@ def main():
             if not pendientes:
                 nombre_anterior = apellido_nombre
             final['validacion'] = validar(final)
+            # agrega número de orden de planilla resultado a salida importable:
+            if '#' in linea:
+                final['orden'] = linea['#']
+            else:
+                final['orden'] = str(orden+1)
             salida.append(final)
-    campos += ['obs_tipo', 'obs_descripcion', 'validacion']
+    campos += ['orden', 'obs_tipo', 'obs_descripcion', 'validacion']
     escribirResultado(campos, salida)
 
 if __name__ == '__main__':

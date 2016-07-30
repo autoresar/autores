@@ -1,6 +1,5 @@
 HECHO- Agregar disciplina por default (Escritura para Breve Diccionario).
 
-- Update or replace existing nodos (using "unique target" mappings)
 HECHO- Hay que cambiar género a "Hombre" o "Mujer"
 HECHO- Tengo que revisar la lista de países cargados en el sitio y usarla para la validación: Si el autor nació en un país no precargado en la taxonomía correspondiente, no se va a importar esa información y no nos vamos a enterar. Tengo tres opciones, en orden de mi preferencia: 1) activar opción autocrear en el importer (ya que el lugar de nacimiento es sometido a la validación de una lista de países válidos), 2) agregar más países a la taxonomía correspondiente, o 3) incorporar un paso extra de validación en el programa para que marque los países que no fueron precargados en la base.
 
@@ -19,8 +18,8 @@ HECHO- Ignorar acentos cuando busco en el diccionario de autores, o cambiar un p
  - También para búsqueda de variantes ignorar mayúsuclas, acentos, y flexibilizar.
 HECHO- En autores.py, agregar nombre de la fuente.
 
- - Corregir: Permitir al usuario especificar como argumento de autores.py el nombre del archivo de entrada y el de salida. Idem integrador.py.
- - Advertir al usuario si el programa sobreescribirá un archivo.
+HECHO- Corregir: Permitir al usuario especificar como argumento de autores.py el nombre del archivo de entrada y el de salida. Idem integrador.py.
+HECHO- Advertir al usuario si el programa sobreescribirá un archivo.
 HECHO- Manejar que el autor precargado tenga un enlace a Wikipedia (mismo enlace_titulo), pero diferente URL (distinto enlace_url, ejemplo con y sin https).
 HECHO- Ajustar la búsqueda flexible de autores.
 
@@ -62,7 +61,7 @@ HECHO- La base de datos crea un enlace vacío si el campo "enlace_titulo" tiene 
   para Windows.
 - Ver si hay una manera de que el archivo taxonomia.csv se genere automática-
   mente de la base.
-- El script integrador podría preguntar al usuario si descargó la última verticales
+HECHO- El script integrador podría preguntar al usuario si descargó la última verticales
   sión de dbdump.csv y pedir que lo haga.
 HECHO- Observar "ERROR" si el usuario fuerza un match con un NID inexistente.
 - Agregar campos 'enlaces_titulo' y 'enlaces_url' a planilla resultados. Enton-
