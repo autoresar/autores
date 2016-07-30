@@ -27,6 +27,7 @@ import unicodedata
 import Levenshtein
 import sys
 import os
+import time
 
 taxonomia = 'taxonomia.csv'
 if len(sys.argv) < 4:
@@ -425,6 +426,17 @@ def ordenados(primero, segundo):
     return ordenados
 
 
+def validarFecha(fecha, formato):
+    """Devuelve TRUE si fecha está vacío o sigue el formato especificado"""
+    if fecha:
+        try:
+            return time.strptime(fecha, formato)
+        except:
+            return False
+    else:
+        return True
+
+
 def validar(final):
     validacion = []
     # términos inválidos por taxonomía:
@@ -451,6 +463,28 @@ def validar(final):
                      if enlaces.count(enlace) > 1])
     if repetidos:
         validacion.append('Enlaces repetidos: ' + ', '.join(repetidos))
+    # validar formato:
+    error_formato = []
+    # valida formato de las fechas y los años:
+    if not validarFecha(final['fecha_nacimiento'], '%d/%m/%Y'):
+        error_formato.append('fecha nacimiento no es DD/MM/AAAA')
+    if not validarFecha(final['fecha_muerte'], '%d/%m/%Y'):
+        error_formato.append('fecha muerte no es DD/MM/AAAA')
+    if not validarFecha(final['ano_nacimiento'], '%Y'):
+        error_formato.append('año nacimiento no tiene 4 dígitos')
+    if not validarFecha(final['ano_muerte'], '%Y'):
+        error_formato.append('año muerte no tiene 4 dígitos')
+    # valida formato de las notas:
+    formato_nota = (r'^{(diferencia|estimado|otro)}{(libro=\d*|web=.*?|'
+                    r'fuente no documental)}({.*?}){0,2}$')
+    if final['notas']:
+        for nota in final['notas'].split('|'):
+            if not re.match(formato_nota, nota):
+                error_formato.append('al menos una nota no sigue formato '
+                                     '{tipo}{fuente}{...}{...}')
+                break
+    if error_formato:
+        validacion.append('Formato: ' + ', '.join(error_formato))
     validacion = '; '.join(validacion)
     if not validacion:
         validacion = 'OK'
