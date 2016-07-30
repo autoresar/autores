@@ -398,7 +398,7 @@ def main():
     salida = []
     campos, dicc_nids, dicc_autores = abrirDump(volcado)
     with open(resultados, encoding='utf-8') as csvfile:
-        csvreader = csv.DictReader(csvfile, delimiter=',', quotechar="'")
+        csvreader = csv.DictReader(csvfile)
         nombre_anterior = ', '
         for linea in csvreader:
             pendientes = []
