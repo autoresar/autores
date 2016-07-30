@@ -356,27 +356,66 @@ def sinCoincidencia(campos, linea, diccionario):
     return final
 
 
+def dividirCompuesto(compuesto):
+    """Dado un nombre o apellido compuesto previamente simplificados, devuelve
+    una lista de sus partes con caracteres no-letras eliminados"""
+    # lista de partículas en las que los espacios se ignorarán
+    no_dividir = ['de la ', 'de ', 'del ', 'di ']
+    for elemento in no_dividir:
+        inicial = r'\b%s' % elemento
+        final = elemento.replace(' ', '')
+        compuesto = re.sub(inicial, final, compuesto)
+    # los espacios dividen las partes del compuesto:
+    compuesto = compuesto.split(' ')
+    # elimina caracteres que no sean letras:
+    for i, parte in enumerate(compuesto):
+        compuesto[i] = re.sub('[^a-z]', '', parte)
+    return compuesto
+
+
 def ordenados(primero, segundo):
     """Dados dos nombres con el formato 'apellido, nombre', indica si el
     primero es alfabéticamente anterior al segundo"""
-    ordenados = 0
+    ordenados = None
     # sustituye mayúsculas y caracteres especiales:
     primero = simplificar(primero)
     segundo = simplificar(segundo)
     # recupera nombre y apellido por separado:
     (primero_apellido, primero_nombre) = primero.split(', ')
     (segundo_apellido, segundo_nombre) = segundo.split(', ')
-    # elimina caracteres que no sean letras:
-    primero_apellido = re.sub('[^a-z]', '', primero_apellido)
-    primero_nombre = re.sub('[^a-z]', '', primero_nombre)
-    segundo_apellido = re.sub('[^a-z]', '', segundo_apellido)
-    segundo_nombre = re.sub('[^a-z]', '', segundo_nombre)
-    if primero_apellido == segundo_apellido:
-        if primero_nombre == min(primero_nombre, segundo_nombre):
+    # obtiene las partes constituyentes:
+    primero_apellido = dividirCompuesto(primero_apellido)
+    primero_nombre = dividirCompuesto(primero_nombre)
+    segundo_apellido = dividirCompuesto(segundo_apellido)
+    segundo_nombre = dividirCompuesto(segundo_nombre)
+    # máxima cantidad de partes de apellidos/nombres comparados:
+    max_apellido = max(len(primero_apellido), len(segundo_apellido))
+    max_nombre = max(len(primero_nombre), len(segundo_nombre))
+    for i in range(max_apellido):
+        if not primero_apellido[i]:
+            primero_apellido[i] = ''
+        if not segundo_apellido[i]:
+            segundo_apellido[i] = ''
+        if primero_apellido < segundo_apellido:
             ordenados = 1
-    else:
-        if primero_apellido == min(primero_apellido, segundo_apellido):
-            ordenados = 1
+            break
+        elif primero_apellido > segundo_apellido:
+            ordenados = 0
+            break
+    if ordenados is None:  # si sigue indefinido
+        for i in range(max_nombre):
+            if not primero_nombre[i]:
+                primero_nombre[i] = ''
+            if not segundo_nombre[i]:
+                segundo_nombre[i] = ''
+            if primero_nombre < segundo_nombre:
+                ordenados = 1
+                break
+            elif primero_nombre > segundo_nombre:
+                ordenados = 0
+                break
+    if ordenados is None:
+        ordenados = 1
     return ordenados
 
 

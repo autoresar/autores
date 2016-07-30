@@ -67,5 +67,5 @@ HECHO- Integrador entiende D'Anna alfabéticamente anterior a Damiani. Corregir.
 - Agregar campos 'enlaces_titulo' y 'enlaces_url' a planilla resultados. Enton-
   ces, deberían estar todos los campos de la planilla importame, más algunos
   adicionales (confianza, número de página, etc)
-- Verificador de orden alfabético debe considerar "de Sosa", "del Río" y
+HECHO- Verificador de orden alfabético debe considerar "de Sosa", "del Río" y
   "de la Fuente" como una unidad, pero "Álvarez Jonte" como unidades separadas.
