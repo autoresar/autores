@@ -357,11 +357,20 @@ def sinCoincidencia(campos, linea, diccionario):
 
 
 def ordenados(primero, segundo):
+    """Dados dos nombres con el formato 'apellido, nombre', indica si el
+    primero es alfabéticamente anterior al segundo"""
     ordenados = 0
-    primero_apellido = primero.split(', ')[0].replace(' ', '')
-    primero_nombre = primero.split(', ')[1].replace(' ', '')
-    segundo_apellido = segundo.split(', ')[0].replace(' ', '')
-    segundo_nombre = segundo.split(', ')[1].replace(' ', '')
+    # sustituye mayúsculas y caracteres especiales:
+    primero = simplificar(primero)
+    segundo = simplificar(segundo)
+    # recupera nombre y apellido por separado:
+    (primero_apellido, primero_nombre) = primero.split(', ')
+    (segundo_apellido, segundo_nombre) = segundo.split(', ')
+    # elimina caracteres que no sean letras:
+    primero_apellido = re.sub('[^a-z]', '', primero_apellido)
+    primero_nombre = re.sub('[^a-z]', '', primero_nombre)
+    segundo_apellido = re.sub('[^a-z]', '', segundo_apellido)
+    segundo_nombre = re.sub('[^a-z]', '', segundo_nombre)
     if primero_apellido == segundo_apellido:
         if primero_nombre == min(primero_nombre, segundo_nombre):
             ordenados = 1
@@ -414,9 +423,9 @@ def main():
                 linea['ano_nacimiento'] = linea['fecha_nacimiento'][-4:]
             if not linea['ano_muerte']:
                 linea['ano_muerte'] = linea['ano_muerte'][-4:]
-            apellido = simplificar(linea['apellidos'])
-            nombre = simplificar(linea['nombres'])
-            nombre_completo = '%s %s' % (nombre, apellido)
+            apellido = linea['apellidos']
+            nombre = linea['nombres']
+            nombre_completo = simplificar('%s %s' % (nombre, apellido))
             apellido_nombre = '%s, %s' % (apellido, nombre)
             ignorar_conflictos = 'ignorar_conflictos' in linea['opciones']
             ignorar_orden = 'ignorar_orden' in linea['opciones']
