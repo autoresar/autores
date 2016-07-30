@@ -388,27 +388,29 @@ for blocknum, block in enumerate(blocks):
             bplace = 'ERR: ' + match.group('data')
     else:
         name = 'ERR: ' + block['text'].replace('\n', ' ')
-    result.append((pagina, name, nick, lastname, gender, name_conf, nick_conf, lastname_conf,
-                   bplace, bprovincia, byear, dyear, byear_conf, dyear_conf,
-                   oracion, discip, subdiscip))
+    result.append({'página': pagina, 'nombres': name, 'seudonimos': nick,
+                   'apellidos': lastname, 'genero': gender,
+                   'nombre_conf': name_conf, 'seudon_conf': nick_conf,
+                   'apellido_conf': lastname_conf, 'sitio': bplace,
+                   'lugar_nacimiento': bprovincia, 'ano_nacimiento': byear,
+                   'ano_muerte': dyear, 'nacim_conf': byear_conf,
+                   'muerte_conf': dyear_conf, 'oracion': oracion,
+                   'disciplinas': discip, 'subdisciplinas': subdiscip})
 
-f = open(resultados, 'w')
-f.write("'#','página','nombres','seudonimos','apellidos','genero',"
-        "'nombre_conf','seudon_conf','apellido_conf',"
-        "'sitio','lugar_nacimiento','ano_nacimiento','ano_muerte',"
-        "'nacim_conf','muerte_conf',"
-        "'oracion','disciplinas','subdisciplinas',"
-        "'fuentes','notas','nid','opciones','omitir'\n")
-for i, author in enumerate(result):
-    line = str(i+1) + ','
-    line += ("'%s','%s','%s','%s','%s',"
-             "'%s','%s','%s',"
-             "'%s','%s','%s','%s',"
-             "'%s','%s',"
-             "'%s','%s','%s'," % author)
-    line += "'%s',,,," % fuente
-    f.write(line+'\n')
-f.close()
+campos = ['#', 'página', 'nombres', 'seudonimos', 'apellidos', 'genero',
+          'nombre_conf', 'seudon_conf', 'apellido_conf',
+          'sitio', 'lugar_nacimiento', 'ano_nacimiento', 'ano_muerte',
+          'nacim_conf', 'muerte_conf',
+          'oracion', 'disciplinas', 'subdisciplinas',
+          'fuentes', 'notas', 'nid', 'opciones', 'omitir']
+with open(resultados, 'w') as csvfile:
+    writer = csv.DictWriter(csvfile, campos)
+    writer.writeheader()
+    for i, autor in enumerate(result):
+        autor['#'] = str(i)
+        autor['fuentes'] = fuente
+        autor.update({'notas': '', 'nid': '', 'opciones': '', 'omitir': ''})
+        writer.writerow(autor)
 
 disciplinas = {}  # colección de disciplinas y número de veces que aparece cada una
 for elemento in todos_los_rasgos:
