@@ -64,7 +64,7 @@ HECHO- La base de datos crea un enlace vacío si el campo "enlace_titulo" tiene 
 HECHO- El script integrador podría preguntar al usuario si descargó la última verticales
   sión de dbdump.csv y pedir que lo haga.
 HECHO- Observar "ERROR" si el usuario fuerza un match con un NID inexistente.
-- Agregar campos 'enlaces_titulo' y 'enlaces_url' a planilla resultados. Enton-
+HECHO- Agregar campos 'enlaces_titulo' y 'enlaces_url' a planilla resultados. Enton-
   ces, deberían estar todos los campos de la planilla importame, más algunos
   adicionales (confianza, número de página, etc)
 HECHO- Verificador de orden alfabético debe considerar "de Sosa", "del Río" y

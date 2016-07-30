@@ -402,14 +402,16 @@ campos = ['#', 'página', 'nombres', 'seudonimos', 'apellidos', 'genero',
           'sitio', 'lugar_nacimiento', 'ano_nacimiento', 'ano_muerte',
           'nacim_conf', 'muerte_conf',
           'oracion', 'disciplinas', 'subdisciplinas',
-          'fuentes', 'notas', 'nid', 'opciones', 'omitir']
+          'fuentes', 'enlaces_titulo', 'enlaces_url', 'notas', 'nid',
+          'opciones', 'omitir']
 with open(resultados, 'w') as csvfile:
     writer = csv.DictWriter(csvfile, campos)
     writer.writeheader()
     for i, autor in enumerate(result):
         autor['#'] = str(i+1)
         autor['fuentes'] = fuente
-        autor.update({'notas': '', 'nid': '', 'opciones': '', 'omitir': ''})
+        autor.update({'enlaces_titulo': '', 'enlaces_url': '', 'notas': '',
+                      'nid': '', 'opciones': '', 'omitir': ''})
         writer.writerow(autor)
 
 disciplinas = {}  # colección de disciplinas y número de veces que aparece cada una
