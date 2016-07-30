@@ -407,7 +407,7 @@ with open(resultados, 'w') as csvfile:
     writer = csv.DictWriter(csvfile, campos)
     writer.writeheader()
     for i, autor in enumerate(result):
-        autor['#'] = str(i)
+        autor['#'] = str(i+1)
         autor['fuentes'] = fuente
         autor.update({'notas': '', 'nid': '', 'opciones': '', 'omitir': ''})
         writer.writerow(autor)
