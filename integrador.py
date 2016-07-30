@@ -530,9 +530,12 @@ def main():
                 if nid == '0':
                     linea['nid'] = ''
                     final = hacerFinal(campos, linea, 'NUEVO', 'forzado')
-                else:
+                elif nid in dicc_nids:
                     viejo = dicc_nids[nid]
                     final = combinar(campos, linea, viejo, ignorar_conflictos)
+                else:
+                    obs = 'nid %s no existe' % nid
+                    final = hacerFinal(campos, linea, 'NID INEXISTENTE', obs)
             elif nombre_completo in dicc_autores:  # con coincidencias
                 final = conCoincidencia(campos, linea, dicc_autores)
             else:  # sin coincidencias
