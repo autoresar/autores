@@ -20,38 +20,68 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+import pdb
 from lxml import etree
+from statistics import mean
 hocr = etree.parse('orgambide.hocr.tmp')
 
-def find_middle_line(page):
-    page_width = int(page.get('title').split('; ')[1].split(' ')[3])
-    left_margin = page_width
-    right_margin = 0
+
+def getMargins(page):
+    """Devuelve los márgenes izquierdo (l) y derecho (r) de las columnas 1 y 2:
+    l1 l2 r1 r2."""
+    # class="ocr_page" ...
+    # title='image "FILENAME"; bbox 0 0 WIDTH HEIGHT; ppageno X'
+    line_spans = []
+    for line in page.xpath('.//*[@class="ocr_line"]'):
+        # class="ocr_line" ...
+        # title="bbox X1 Y1 X2 Y2; baseline ? ?"
+        line_x1 = int(line.get('title').split('; ')[0].split(' ')[1])
+        line_x2 = int(line.get('title').split('; ')[0].split(' ')[3])
+        line_spans.append((line_x1, line_x2))
+    col1_left_margin = min([span[0] for span in line_spans])
+    col2_right_margin = max([span[1] for span in line_spans])
+    middle_line = (col2_right_margin - col1_left_margin) / 2 + col1_left_margin
+    if int(page.get('id').split('_')[1]) == 204:
+        pdb.set_trace()
+    col1_right_margin = max([span[1] for span in line_spans
+                             if span[1] < middle_line])
+    col2_left_margin = min([span[0] for span in line_spans
+                            if span[0] > middle_line])
+    return (col1_left_margin, col1_right_margin,
+            col2_left_margin, col2_right_margin)
+
+autores = []
+for page in hocr.xpath('//*[@class="ocr_page"]'):
+    page_number = int(page.get('id').split('_')[1])
+    # página 204 fue interpretada erróneamente por OCR como de una sola columna
+    if page_number in [204,333]:
+        continue
+    col1_left, col1_right, col2_left, col2_right = getMargins(page)
     for line in page.xpath('.//*[@class="ocr_line"]'):
         line_x1 = int(line.get('title').split('; ')[0].split(' ')[1])
         line_x2 = int(line.get('title').split('; ')[0].split(' ')[3])
-        if line_x1 < left_margin:
-            left_margin = line_x1
-        if line_x2 > right_margin:
-            right_margin = line_x2
-    middle = (right_margin - left_margin) / 2 + left_margin
-    return middle
+        #pdb.set_trace()
+        if line_x2 <= col1_right:
+            rel_indent = (line_x1 - col1_left) / (col1_right - col1_left)
+        elif line_x1 >= col2_left:
+            rel_indent = (line_x1 - col2_left) / (col2_right - col2_left)
+        else:
+            print(line)
+            continue
+        #pdb.set_trace()
+        if rel_indent > .05 and rel_indent < .2:
+        # podría dibujar un histograma para ver dónde ocurren las sangrías
+            autores.append([line])
+        else:
+            autores[-1].append(line)
 
-for page in hocr.xpath('//*[@class="ocr_page"]'):
-    page_number = page.get('id').split('_')[1]
-    middle_line = find_middle_line(page)
-    # TENGO QUE VER CÓMO IGNORAR LÍNEAS CENTRADAS (CRUZAN LA MITAD)
-    left_column = []
-    right_column = []
-    for line in page.xpath('.//*[@class="ocr_line"]'):
-        line_x1 = int(line.get('title').split('; ')[0].split(' ')[1])
-        if line_x1 < middle_line:
-            left_column.append(line)
-        elif line_x1 >= middle_line:
-            right_column.append(line)
-    print('Page %s' % page_number)
-    print('Left column: %d lines' % len(left_column))
-    print('Right column: %d lines' % len(right_column))
+for autor in autores:
+    print(autor[0].xpath('.//*[@class="ocrx_word"]//text()'))
+
+# cuando la columna está torcida, las líneas más a la derecha de la línea más a la izquierda se interpretan como indentadas
+# en la pág 397 del original hay una línea vertical que confunde al OCR
+# Hay mucho texto indentado que no es nuevo párrafo. Hay que validar autor también antes de romper lista
+# quizá debería cambiar estrategia e ir directamente por líneas que comienzan con alta concentración de mayúsculas
 
 
 # # elimina los espacios ENTRE tags:
