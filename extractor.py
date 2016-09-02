@@ -69,20 +69,24 @@ for page in hocr.xpath('//*[@class="ocr_page"]'):
             print(line)
             continue
         #pdb.set_trace()
+        words = line.xpath('.//*[@class="ocrx_word"]')
         if rel_indent > .05 and rel_indent < .2:
         # podría dibujar un histograma para ver dónde ocurren las sangrías
-            autores.append([line])
+            autores.append(words)
         else:
-            autores[-1].append(line)
+            autores[-1] += words
 
 for autor in autores:
-    print(autor[0].xpath('.//*[@class="ocrx_word"]//text()'))
+    # obtiene el texto de cada elemento word del autor y lo concatena
+    print(' '.join([word.xpath('.//text()')[0] for word in autor]))
+    # FALLA SI EL ELEMENTO PALABRA ESTÁ VAĆIO (VER "ENCOMIENDO MIS COSAS A SU PARA...")
 
 # cuando la columna está torcida, las líneas más a la derecha de la línea más a la izquierda se interpretan como indentadas
 # en la pág 397 del original hay una línea vertical que confunde al OCR
 # Hay mucho texto indentado que no es nuevo párrafo. Hay que validar autor también antes de romper lista
 # quizá debería cambiar estrategia e ir directamente por líneas que comienzan con alta concentración de mayúsculas
-
+# devuelve texto en línea 8 de la página 1 sin la última palabra: \n
+# ''.join(hocr.xpath('//*[@class="ocr_page"][1]//*[@class="ocr_line"]')[7].xpath('.//text()')[:-1])
 
 # # elimina los espacios ENTRE tags:
 # doc = etree.parse('orgambide.hocr', etree.XMLParser(remove_blank_text=True))
