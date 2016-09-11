@@ -23,6 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import pdb
 from lxml import etree
 from statistics import mean
+
+# el elemento html del archivo hOCR no debe tener un namespace declarado;
+# es decir, se debe eliminar el atributo xmlns del elemento namespace
 hocr = etree.parse('orgambide.hocr.tmp')
 page_offset = 16
 # indent_ratio_span indica sangrías mínima y máxima de una línea para ser
@@ -57,6 +60,9 @@ def getMargins(page):
 
 
 def getColumns(page):
+    """Devuelve una lista de columnas; cada columna es a la vez una lista de
+    los elementos 'línea' que la constituyen, excepto las líneas pegadas al
+    borde superior de la página, que son ignoradas"""
     lines = page.xpath('.//*[@class="ocr_line"]')
     columns = []
     # title='image "FILENAME"; bbox 0 0 WIDTH HEIGHT; ppageno X'
@@ -92,6 +98,12 @@ def findLeftMargin(column):
     # retrieves lines with most frequent lengths and picks the longest:
     most_freq_lengths = sorted(line_lengths,
                                key=lambda k: len(line_lengths[k]))[-3:]
+    # in short columns, if main length is chosen below such that only one line
+    # has that length, calculation of b below fails because y1 = y2, and hence
+    # y2 - y1 = 0; temporary workaround: lengths represented by only one line
+    # are ignored:
+    most_freq_lengths = [l for l in most_freq_lengths
+                         if len(line_lengths[l]) > 1]
     main_length = max(most_freq_lengths)
     # gets x,y coordinates for first and last lines of length = main_length:
     x1 = int(line_lengths[main_length][0]
@@ -108,8 +120,11 @@ def findLeftMargin(column):
 
 autores = []
 pages = hocr.xpath('//*[@class="ocr_page"]')
+# anomalous_pages es una lista de los números de página con número de columnas
+# distinto de 2:
 anomalous_pages = []
 for page in pages:
+    # <div class='ocr_page' id='page_N'...>
     page_number = int(page.get('id').split('_')[1]) + page_offset
     columns = getColumns(page)
     if len(columns) != 2:
@@ -119,6 +134,8 @@ for page in pages:
         # x = by + a
         b, a, column_width = findLeftMargin(column)
         for line in column:
+            # obtiene el vértice superior izquierdo (line_x, line_y) del
+            # elemento línea, title="bbox X1 Y1 X2 Y2; ...":
             line_x = int(line.get('title').split('; ')[0].split()[1])
             line_y = int(line.get('title').split('; ')[0].split()[2])
             left_margin = line_y * b + a
