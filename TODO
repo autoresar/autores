@@ -69,3 +69,10 @@ HECHO- Agregar campos 'enlaces_titulo' y 'enlaces_url' a planilla resultados. En
   adicionales (confianza, número de página, etc)
 HECHO- Verificador de orden alfabético debe considerar "de Sosa", "del Río" y
   "de la Fuente" como una unidad, pero "Álvarez Jonte" como unidades separadas.
+
+***
+Catálogo de autoridades
+***
+- Incluir información obtenida de catálogos de autoridades:
+ * http://viaf.org/viaf/data/
+ * http://catalogo.bn.gov.ar/F/C9F9SDGS2EDB3191SLNMKDFG3FKYG2H7QMB8XPCQB99KG7JEKX-42082?func=find-b-0
